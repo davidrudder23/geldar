@@ -1,20 +1,8 @@
 package org.noses.game;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.ApplicationListener;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapLayers;
@@ -26,8 +14,10 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Timer;
-import com.badlogic.gdx.utils.Timer.Task;
+import org.noses.game.character.Character;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MyGdxGame extends ApplicationAdapter implements ApplicationListener, GestureListener, InputProcessor {
 	private TiledMapRenderer tiledMapRenderer;
@@ -37,12 +27,7 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 	private int tilePixelWidth;
 	private int tilePixelHeight;
 
-	TextureRegion[][] avatarAnimation;
-	
-	private int avatarLeft;
-	private int avatarTop;
-	private int avatarDirection;
-	private int avatarCurrentFrame;
+	Character avatar;
 
 	@Override
 	public void create() {
@@ -59,31 +44,9 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 		tilePixelWidth = prop.get("tilewidth", Integer.class);
 		tilePixelHeight = prop.get("tileheight", Integer.class);
 
-		avatarLeft = 0;
-		avatarTop = tilePixelHeight;
-		avatarDirection = 0;
-		
-		avatarAnimation = getAvatarAnimation();
-		
-		Timer.schedule(new Task(){
-            @Override
-            public void run() {
-            	avatarCurrentFrame++;
-                if(avatarCurrentFrame > 3)
-                	avatarCurrentFrame = 0;
-            }
-        }
-        ,0f,1/10.0f);
+		avatar = new Character("avatar.png");
 
-		// avatarSprite = new Sprite();
 		Gdx.input.setInputProcessor(this);
-	}
-
-	private TextureRegion[][] getAvatarAnimation() {
-		Texture walkSheet = new Texture("avatar.png");
-		TextureRegion[][] frames = TextureRegion.split(walkSheet, walkSheet.getWidth() / 4, walkSheet.getHeight() / 4);
-
-		return frames;
 	}
 
 	@Override
@@ -95,28 +58,28 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 		recenterCamera();
 		
 	    TiledMapTileLayer.Cell cell = new TiledMapTileLayer.Cell();
-	    cell.setTile(new StaticTiledMapTile(avatarAnimation[avatarDirection][avatarCurrentFrame]));
+	    cell.setTile(new StaticTiledMapTile(avatar.getAnimation()[avatar.getDirection()][avatar.getFrame()]));
 	    TiledMapTileLayer avatarLayer = getAvatarLayer();
-	    avatarLayer.setCell(avatarLeft/tilePixelWidth, avatarTop/tilePixelHeight, cell);
+	    avatarLayer.setCell(avatar.getX()/tilePixelWidth, avatar.getY()/tilePixelHeight, cell);
 	    
 		tiledMapRenderer.setView(camera);
 		tiledMapRenderer.render();
 	}
 
 	private void recenterCamera() {
-		float camCenterX = avatarLeft;
-		float camCenterY = avatarTop;
+		float camCenterX = avatar.getX();
+		float camCenterY = avatar.getY();
 
-		float camTop = avatarTop - (camera.viewportHeight/2);
+		float camTop = avatar.getY() - (camera.viewportHeight/2);
 
-		if (avatarLeft < camera.viewportWidth/2) camCenterX = (camera.viewportWidth/2);
-		if (avatarTop < (camera.viewportHeight/2)) camCenterY = (camera.viewportHeight/2);
+		if (avatar.getX() < camera.viewportWidth/2) camCenterX = (camera.viewportWidth/2);
+		if (avatar.getY() < (camera.viewportHeight/2)) camCenterY = (camera.viewportHeight/2);
 
 		float rightBoundary = (getAvatarLayer().getWidth()*tilePixelWidth)-(camera.viewportWidth/2);
-		if (avatarLeft > rightBoundary) camCenterX = rightBoundary;
+		if (avatar.getX() > rightBoundary) camCenterX = rightBoundary;
 
 		float bottomBoundary = (getAvatarLayer().getHeight()*tilePixelHeight)-(camera.viewportHeight/2);
-		if (avatarTop > bottomBoundary) camCenterY = bottomBoundary;
+		if (avatar.getY() > bottomBoundary) camCenterY = bottomBoundary;
 
 		camera.position.set(camCenterX, camCenterY, 0);
 
@@ -124,9 +87,9 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 	}
 
 	private boolean isCollision(int moveHoriz, int moveVert) {
-		int left = (int) (Math.floor(avatarLeft / tilePixelWidth))+moveHoriz;
+		int left = (int) (Math.floor(avatar.getX() / tilePixelWidth))+moveHoriz;
 		int right = left + (int) (Math.floor(tilePixelWidth / tilePixelWidth));
-		int top = (int) (Math.floor(avatarTop / tilePixelHeight))+moveVert;
+		int top = (int) (Math.floor(avatar.getY() / tilePixelHeight))+moveVert;
 		int bottom = top + (int) (Math.floor(tilePixelHeight / tilePixelHeight));
 
 		List<TiledMapTileLayer> obstructionLayers = getObstructionLayers();
@@ -144,8 +107,8 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 	}
 
 	private boolean isOffScreen(int moveHoriz, int moveVert) {
-		int newTileX = (avatarLeft/tilePixelWidth) + moveHoriz;
-		int newTileY = (avatarTop/tilePixelHeight) + moveVert;
+		int newTileX = (avatar.getX()/tilePixelWidth) + moveHoriz;
+		int newTileY = (avatar.getY()/tilePixelHeight) + moveVert;
 
 		if (newTileX < 0) return true;
 		if (newTileX >= getAvatarLayer().getWidth()) return true;
@@ -201,35 +164,35 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 	@Override
 	public boolean keyUp(int keycode) {
 	    TiledMapTileLayer avatarLayer = getAvatarLayer();
-	    avatarLayer.setCell(avatarLeft/tilePixelWidth, avatarTop/tilePixelHeight, null);
+	    avatarLayer.setCell(avatar.getX()/tilePixelWidth, avatar.getY()/tilePixelHeight, null);
 
 		if (keycode == Input.Keys.LEFT) {
-			avatarDirection = 2;
+            avatar.setDirection(2);
 			if (isMovementBlocked(-1, 0)) {
 				return false;
 			}
-			avatarLeft -= 32;
+			avatar.setX(avatar.getX()-tilePixelWidth);
 		}
 		if (keycode == Input.Keys.RIGHT){
-			avatarDirection = 1;
+            avatar.setDirection(1);
 			if (isMovementBlocked(1, 0)) {
 				return false;
 			}
-			avatarLeft += 32;
+            avatar.setX(avatar.getX()+tilePixelWidth);
 		}
 		if (keycode == Input.Keys.UP){
-			avatarDirection = 3;
+            avatar.setDirection(3);
 			if (isMovementBlocked(0, 1)) {
 				return false;
 			}
-			avatarTop += 32;
+            avatar.setY(avatar.getY()+tilePixelHeight);
 		}
 		if (keycode == Input.Keys.DOWN){
-			avatarDirection = 0;
+			avatar.setDirection(0);
 			if (isMovementBlocked(0, -1)) {
 				return false;
 			}
-			avatarTop -= 32;
+            avatar.setY(avatar.getY()-tilePixelHeight);
 		}
 
 		return false;
@@ -238,7 +201,6 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 	@Override
 	public boolean keyTyped(char character) {
 		// TODO Auto-generated method stub
-		System.out.println("char="+character);
 		return false;
 	}
 

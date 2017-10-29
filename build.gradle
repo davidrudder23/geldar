@@ -10,9 +10,19 @@ buildscript {
 
     dependencies {
         classpath 'de.richsource.gradle.plugins:gwt-gradle-plugin:0.6'
-        
-
     }
+}
+
+plugins {
+    id 'io.franzbecker.gradle-lombok' version '1.10'
+    id 'java'
+}
+lombok {
+    sha256 = "" // skip verifyLombok task
+}
+
+dependencies {
+    compile "org.projectlombok:lombok:1.14.16"
 }
 
 allprojects {
@@ -38,8 +48,6 @@ allprojects {
     }
 }
 
-
-
 project(":desktop") {
     apply plugin: "java"
 
@@ -51,7 +59,6 @@ project(":desktop") {
         compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
-        
     }
 }
 
@@ -78,7 +85,7 @@ project(":core") {
     dependencies {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
-        
+
     }
 }
 
