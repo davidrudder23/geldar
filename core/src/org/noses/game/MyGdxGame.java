@@ -92,8 +92,7 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
-		camera.position.set(avatarLeft, avatarTop, 0);
-		camera.update();
+		recenterCamera();
 		
 	    TiledMapTileLayer.Cell cell = new TiledMapTileLayer.Cell();
 	    cell.setTile(new StaticTiledMapTile(avatarAnimation[avatarDirection][avatarCurrentFrame]));
@@ -102,8 +101,26 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 	    
 		tiledMapRenderer.setView(camera);
 		tiledMapRenderer.render();
+	}
 
+	private void recenterCamera() {
+		float camCenterX = avatarLeft;
+		float camCenterY = avatarTop;
 
+		float camTop = avatarTop - (camera.viewportHeight/2);
+
+		if (avatarLeft < camera.viewportWidth/2) camCenterX = (camera.viewportWidth/2);
+		if (avatarTop < (camera.viewportHeight/2)) camCenterY = (camera.viewportHeight/2);
+
+		float rightBoundary = (getAvatarLayer().getWidth()*tilePixelWidth)-(camera.viewportWidth/2);
+		if (avatarLeft > rightBoundary) camCenterX = rightBoundary;
+
+		float bottomBoundary = (getAvatarLayer().getHeight()*tilePixelHeight)-(camera.viewportHeight/2);
+		if (avatarTop > bottomBoundary) camCenterY = bottomBoundary;
+
+		camera.position.set(camCenterX, camCenterY, 0);
+
+		camera.update();
 	}
 
 	private boolean isCollision(int moveHoriz, int moveVert) {
@@ -123,6 +140,23 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 				}
 			}
 		};
+		return false;
+	}
+
+	private boolean isOffScreen(int moveHoriz, int moveVert) {
+		int newTileX = (avatarLeft/tilePixelWidth) + moveHoriz;
+		int newTileY = (avatarTop/tilePixelHeight) + moveVert;
+
+		if (newTileX < 0) return true;
+		if (newTileX >= getAvatarLayer().getWidth()) return true;
+		if (newTileY < 0) return true;
+		if (newTileY >= getAvatarLayer().getHeight()) return true;
+
+		return false;
+	}
+	private boolean isMovementBlocked(int moveHoriz, int moveVert) {
+		if (isOffScreen(moveHoriz, moveVert)) return true;
+		if (isCollision(moveHoriz, moveVert)) return true;
 		return false;
 	}
 
@@ -168,47 +202,43 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 	public boolean keyUp(int keycode) {
 	    TiledMapTileLayer avatarLayer = getAvatarLayer();
 	    avatarLayer.setCell(avatarLeft/tilePixelWidth, avatarTop/tilePixelHeight, null);
-	    
+
 		if (keycode == Input.Keys.LEFT) {
-			if (isCollision(-1, 0)) {
+			avatarDirection = 2;
+			if (isMovementBlocked(-1, 0)) {
 				return false;
 			}
-			avatarDirection = 2;
 			avatarLeft -= 32;
 		}
 		if (keycode == Input.Keys.RIGHT){
-			if (isCollision(1, 0)) {
+			avatarDirection = 1;
+			if (isMovementBlocked(1, 0)) {
 				return false;
 			}
-			avatarDirection = 1;
 			avatarLeft += 32;
 		}
 		if (keycode == Input.Keys.UP){
-			if (isCollision(0, 1)) {
+			avatarDirection = 3;
+			if (isMovementBlocked(0, 1)) {
 				return false;
 			}
-			avatarDirection = 3;
 			avatarTop += 32;
 		}
 		if (keycode == Input.Keys.DOWN){
-			if (isCollision(0, -1)) {
+			avatarDirection = 0;
+			if (isMovementBlocked(0, -1)) {
 				return false;
 			}
-			avatarDirection = 0;
 			avatarTop -= 32;
 		}
-		if (keycode == Input.Keys.NUM_1)
-			tiledMap.getLayers().get(0).setVisible(!tiledMap.getLayers().get(0).isVisible());
-		if (keycode == Input.Keys.NUM_2)
-			tiledMap.getLayers().get(1).setVisible(!tiledMap.getLayers().get(1).isVisible());
-		if (keycode == Input.Keys.NUM_3)
-			tiledMap.getLayers().get(2).setVisible(!tiledMap.getLayers().get(2).isVisible());
+
 		return false;
 	}
 
 	@Override
 	public boolean keyTyped(char character) {
 		// TODO Auto-generated method stub
+		System.out.println("char="+character);
 		return false;
 	}
 
