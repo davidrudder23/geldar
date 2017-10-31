@@ -35,6 +35,22 @@ public class Character {
                 ,0f,1/10.0f);
 
     }
+    
+    public void moveNorth() {
+    	setY(getY()+1);
+    }
+
+    public void moveSouth() {
+    	setY(getY()-1);
+    }
+
+    public void moveEast() {
+    	setX(getX()+1);
+    }
+
+    public void moveWest() {
+    	setX(getX()-1);
+    }
 
     public int getX() {
         return x;

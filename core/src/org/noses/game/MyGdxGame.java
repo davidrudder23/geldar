@@ -60,7 +60,7 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 	    TiledMapTileLayer.Cell cell = new TiledMapTileLayer.Cell();
 	    cell.setTile(new StaticTiledMapTile(avatar.getAnimation()[avatar.getDirection()][avatar.getFrame()]));
 	    TiledMapTileLayer avatarLayer = getAvatarLayer();
-	    avatarLayer.setCell(avatar.getX()/tilePixelWidth, avatar.getY()/tilePixelHeight, cell);
+	    avatarLayer.setCell(avatar.getX(), avatar.getY(), cell);
 	    
 		tiledMapRenderer.setView(camera);
 		tiledMapRenderer.render();
@@ -70,45 +70,48 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 		float camCenterX = avatar.getX();
 		float camCenterY = avatar.getY();
 
-		float camTop = avatar.getY() - (camera.viewportHeight/2);
+		float camHeightInTiles = (camera.viewportHeight/2)/tilePixelHeight;
+		float camWidthInTiles = (camera.viewportWidth/2)/tilePixelWidth;
+		
+		System.out.println("camHeightInTiles="+camHeightInTiles);
+		System.out.println("camWidthInTiles="+camWidthInTiles);
+		System.out.println("avatar.getX()="+avatar.getX());
+		System.out.println("avatar.getY()="+avatar.getY());
 
-		if (avatar.getX() < camera.viewportWidth/2) camCenterX = (camera.viewportWidth/2);
-		if (avatar.getY() < (camera.viewportHeight/2)) camCenterY = (camera.viewportHeight/2);
+		if (avatar.getX() < camWidthInTiles) camCenterX = camWidthInTiles;
+		if (avatar.getY() < camHeightInTiles) camCenterY = camHeightInTiles;
 
-		float rightBoundary = (getAvatarLayer().getWidth()*tilePixelWidth)-(camera.viewportWidth/2);
+		float rightBoundary = getAvatarLayer().getWidth()-camWidthInTiles;
 		if (avatar.getX() > rightBoundary) camCenterX = rightBoundary;
 
-		float bottomBoundary = (getAvatarLayer().getHeight()*tilePixelHeight)-(camera.viewportHeight/2);
+		float bottomBoundary = getAvatarLayer().getHeight()-camHeightInTiles;
 		if (avatar.getY() > bottomBoundary) camCenterY = bottomBoundary;
 
-		camera.position.set(camCenterX, camCenterY, 0);
+		System.out.println("camCenterX="+camCenterX);
+		System.out.println("camCenterY="+camCenterY);
+
+		camera.position.set(camCenterX*tilePixelWidth, camCenterY*tilePixelHeight, 0);
 
 		camera.update();
 	}
 
 	private boolean isCollision(int moveHoriz, int moveVert) {
-		int left = (int) (Math.floor(avatar.getX() / tilePixelWidth))+moveHoriz;
-		int right = left + (int) (Math.floor(tilePixelWidth / tilePixelWidth));
-		int top = (int) (Math.floor(avatar.getY() / tilePixelHeight))+moveVert;
-		int bottom = top + (int) (Math.floor(tilePixelHeight / tilePixelHeight));
+		int left = avatar.getX()+moveHoriz;
+		int top = avatar.getY()+moveVert;
 
 		List<TiledMapTileLayer> obstructionLayers = getObstructionLayers();
 
 		for (TiledMapTileLayer ml: obstructionLayers) {
-			for (int x = left; x < right; x++) {
-				for (int y = top; y < bottom; y++) {
-					if (ml.getCell(x, y) != null) {
-						return true;
-					}
-				}
+			if (ml.getCell(left, top) != null) {
+				return true;
 			}
-		};
+		}
 		return false;
 	}
 
 	private boolean isOffScreen(int moveHoriz, int moveVert) {
-		int newTileX = (avatar.getX()/tilePixelWidth) + moveHoriz;
-		int newTileY = (avatar.getY()/tilePixelHeight) + moveVert;
+		int newTileX = avatar.getX() + moveHoriz;
+		int newTileY = avatar.getY() + moveVert;
 
 		if (newTileX < 0) return true;
 		if (newTileX >= getAvatarLayer().getWidth()) return true;
@@ -164,35 +167,35 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 	@Override
 	public boolean keyUp(int keycode) {
 	    TiledMapTileLayer avatarLayer = getAvatarLayer();
-	    avatarLayer.setCell(avatar.getX()/tilePixelWidth, avatar.getY()/tilePixelHeight, null);
+	    avatarLayer.setCell(avatar.getX(), avatar.getY(), null);
 
 		if (keycode == Input.Keys.LEFT) {
             avatar.setDirection(2);
 			if (isMovementBlocked(-1, 0)) {
 				return false;
 			}
-			avatar.setX(avatar.getX()-tilePixelWidth);
+			avatar.moveWest();
 		}
 		if (keycode == Input.Keys.RIGHT){
             avatar.setDirection(1);
 			if (isMovementBlocked(1, 0)) {
 				return false;
 			}
-            avatar.setX(avatar.getX()+tilePixelWidth);
+            avatar.moveEast();
 		}
 		if (keycode == Input.Keys.UP){
             avatar.setDirection(3);
 			if (isMovementBlocked(0, 1)) {
 				return false;
 			}
-            avatar.setY(avatar.getY()+tilePixelHeight);
+            avatar.moveNorth();
 		}
 		if (keycode == Input.Keys.DOWN){
 			avatar.setDirection(0);
 			if (isMovementBlocked(0, -1)) {
 				return false;
 			}
-            avatar.setY(avatar.getY()-tilePixelHeight);
+            avatar.moveSouth();
 		}
 
 		return false;
