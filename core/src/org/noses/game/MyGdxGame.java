@@ -56,11 +56,15 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
 		recenterCamera();
+		camera.update();
+
 		
 	    TiledMapTileLayer.Cell cell = new TiledMapTileLayer.Cell();
 	    cell.setTile(new StaticTiledMapTile(avatar.getAnimation()[avatar.getDirection()][avatar.getFrame()]));
 	    TiledMapTileLayer avatarLayer = getAvatarLayer();
 	    avatarLayer.setCell(avatar.getX(), avatar.getY(), cell);
+	    
+	    //getHighlightLayer().getCell(avatar.getX(), avatar.getY()).setTile(tile)
 	    
 		tiledMapRenderer.setView(camera);
 		tiledMapRenderer.render();
@@ -92,7 +96,6 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 
 		camera.position.set(camCenterX*tilePixelWidth, camCenterY*tilePixelHeight, 0);
 
-		camera.update();
 	}
 
 	private boolean isCollision(int moveHoriz, int moveVert) {
@@ -127,11 +130,24 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 	}
 
 	private List<TiledMapTileLayer> getObstructionLayers() {
+		return getLayersByName("obstruction");
+	}
+	
+	private TiledMapTileLayer getHighlightLayer() {
+		return getLayersByName("highlight"),get(0);
+	}
+	
+	private TiledMapTileLayer getAvatarLayer() {
+		List<TiledMapTileLayer> avatarLayers = getLayersByName("walking");
+		return avatarLayers.get(0);
+	}
+
+	private List<TiledMapTileLayer> getLayersByName(String name) {
 		List<TiledMapTileLayer> obstructionLayers = new ArrayList<>();
 		MapLayers mapLayers = tiledMap.getLayers();
 		for (int i = 0; i < mapLayers.getCount(); i++) {
 			MapLayer mapLayer = mapLayers.get(i);
-			if ((mapLayer.getName().toLowerCase().contains("obstruction")) && (mapLayer instanceof TiledMapTileLayer)) {
+			if ((mapLayer.getName().toLowerCase().contains(name.toLowerCase())) && (mapLayer instanceof TiledMapTileLayer)) {
 				TiledMapTileLayer tmtl = (TiledMapTileLayer) mapLayer;
 				obstructionLayers.add(tmtl);
 			}
@@ -140,19 +156,6 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 		return obstructionLayers;
 	}
 	
-	private TiledMapTileLayer getAvatarLayer() {
-		MapLayers mapLayers = tiledMap.getLayers();
-		for (int i = 0; i < mapLayers.getCount(); i++) {
-			MapLayer mapLayer = mapLayers.get(i);
-			if ((mapLayer.getName().toLowerCase().contains("walking")) && (mapLayer instanceof TiledMapTileLayer)) {
-				TiledMapTileLayer tmtl = (TiledMapTileLayer) mapLayer;
-				return tmtl;
-			}
-		}
-
-		return null;
-	}
-
 	@Override
 	public void resize(int width, int height) {
 		// stage.getViewport().update(width, height, true);
