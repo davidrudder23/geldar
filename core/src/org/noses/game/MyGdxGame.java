@@ -3,6 +3,8 @@ package org.noses.game;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapLayers;
@@ -10,14 +12,19 @@ import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Vector2;
 import org.noses.game.character.Character;
+import org.noses.game.character.MovingCharacter;
+import org.noses.game.path.Point;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MyGdxGame extends ApplicationAdapter implements ApplicationListener, GestureListener, InputProcessor {
 	private TiledMapRenderer tiledMapRenderer;
@@ -27,7 +34,9 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 	private int tilePixelWidth;
 	private int tilePixelHeight;
 
-	Character avatar;
+	MovingCharacter avatar;
+	
+	Map<String,Cell> highlights;
 
 	@Override
 	public void create() {
@@ -44,16 +53,54 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 		tilePixelWidth = prop.get("tilewidth", Integer.class);
 		tilePixelHeight = prop.get("tileheight", Integer.class);
 
-		avatar = new Character("avatar.png");
+		avatar = new MovingCharacter("avatar.png", getObstructionLayers(), getAvatarLayer());
+		
+		highlights = new HashMap<>();
+		
+	    TiledMapTileLayer.Cell red = new TiledMapTileLayer.Cell();
+	    red.setTile(new StaticTiledMapTile(new TextureRegion(new Texture("red.png"))));
+		highlights.put("red", red);
+		
+	    TiledMapTileLayer.Cell green = new TiledMapTileLayer.Cell();
+	    green.setTile(new StaticTiledMapTile(new TextureRegion(new Texture("green.png"))));
+		highlights.put("green", green);
+		
+	    TiledMapTileLayer.Cell yellow = new TiledMapTileLayer.Cell();
+	    yellow.setTile(new StaticTiledMapTile(new TextureRegion(new Texture("yellow.png"))));
+		highlights.put("yellow", yellow);
+		
+//		System.out.println("-----****-----");
+//		System.out.println(avatar.getPath(new Point(90,90)));
+//		System.out.println("-----****-----");
+//		System.exit(0);
 
 		Gdx.input.setInputProcessor(this);
 	}
 
 	@Override
 	public void render() {
+		for (int x = 0; x < 100; x++) {
+			for (int y = 0; y < 100; y++) {
+			    getAvatarLayer().setCell(x,y, null);
+			    getHighlightLayer().setCell(x,y, null);
+			}
+		}
 		Gdx.gl.glClearColor(1, 0, 0, 1);
 		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		
+		// Highlight the mouse
+		int tileX = Gdx.input.getX()/tilePixelWidth;
+		int tileY = (int)((camera.viewportHeight-Gdx.input.getY())/tilePixelHeight);
+
+		List<Point> path = avatar.getPath(new Point(tileX, tileY));
+		if (path == null) {
+			getHighlightLayer().setCell(tileX, tileY, highlights.get("red"));			
+		} else {
+			for (Point point: path) {
+				getHighlightLayer().setCell(point.getX(), point.getY(), highlights.get("green"));			
+			}
+		}
 		
 		recenterCamera();
 		camera.update();
@@ -63,8 +110,6 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 	    cell.setTile(new StaticTiledMapTile(avatar.getAnimation()[avatar.getDirection()][avatar.getFrame()]));
 	    TiledMapTileLayer avatarLayer = getAvatarLayer();
 	    avatarLayer.setCell(avatar.getX(), avatar.getY(), cell);
-	    
-	    //getHighlightLayer().getCell(avatar.getX(), avatar.getY()).setTile(tile)
 	    
 		tiledMapRenderer.setView(camera);
 		tiledMapRenderer.render();
@@ -77,10 +122,10 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 		float camHeightInTiles = (camera.viewportHeight/2)/tilePixelHeight;
 		float camWidthInTiles = (camera.viewportWidth/2)/tilePixelWidth;
 		
-		System.out.println("camHeightInTiles="+camHeightInTiles);
-		System.out.println("camWidthInTiles="+camWidthInTiles);
-		System.out.println("avatar.getX()="+avatar.getX());
-		System.out.println("avatar.getY()="+avatar.getY());
+		//System.out.println("camHeightInTiles="+camHeightInTiles);
+		//System.out.println("camWidthInTiles="+camWidthInTiles);
+		//System.out.println("avatar.getX()="+avatar.getX());
+		//System.out.println("avatar.getY()="+avatar.getY());
 
 		if (avatar.getX() < camWidthInTiles) camCenterX = camWidthInTiles;
 		if (avatar.getY() < camHeightInTiles) camCenterY = camHeightInTiles;
@@ -91,8 +136,8 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 		float bottomBoundary = getAvatarLayer().getHeight()-camHeightInTiles;
 		if (avatar.getY() > bottomBoundary) camCenterY = bottomBoundary;
 
-		System.out.println("camCenterX="+camCenterX);
-		System.out.println("camCenterY="+camCenterY);
+		//System.out.println("camCenterX="+camCenterX);
+		//System.out.println("camCenterY="+camCenterY);
 
 		camera.position.set(camCenterX*tilePixelWidth, camCenterY*tilePixelHeight, 0);
 
@@ -134,7 +179,7 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 	}
 	
 	private TiledMapTileLayer getHighlightLayer() {
-		return getLayersByName("highlight"),get(0);
+		return getLayersByName("highlight").get(0);
 	}
 	
 	private TiledMapTileLayer getAvatarLayer() {
@@ -158,7 +203,6 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 	
 	@Override
 	public void resize(int width, int height) {
-		// stage.getViewport().update(width, height, true);
 	}
 
 	@Override
@@ -169,9 +213,6 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 
 	@Override
 	public boolean keyUp(int keycode) {
-	    TiledMapTileLayer avatarLayer = getAvatarLayer();
-	    avatarLayer.setCell(avatar.getX(), avatar.getY(), null);
-
 		if (keycode == Input.Keys.LEFT) {
             avatar.setDirection(2);
 			if (isMovementBlocked(-1, 0)) {
@@ -230,6 +271,11 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 
 	@Override
 	public boolean mouseMoved(int screenX, int screenY) {
+		int tileX = screenX/tilePixelWidth;
+		int tileY = (int)((camera.viewportHeight-screenY)/tilePixelHeight);
+
+		//System.out.println("tileX="+tileX+", tileY="+tileY);
+		getHighlightLayer().setCell(tileX, tileY, highlights.get("red"));
 		// TODO Auto-generated method stub
 		return false;
 	}
