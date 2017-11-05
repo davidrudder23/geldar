@@ -30,7 +30,7 @@ public class Character {
         direction = 0;
         frame = 0;
 
-        Texture avatarAnimationSheet = new Texture("avatar.png");
+        Texture avatarAnimationSheet = new Texture(spriteFilename);
         animation = TextureRegion.split(avatarAnimationSheet, avatarAnimationSheet.getWidth() / 4, avatarAnimationSheet.getHeight() / 4);
 
         Timer.schedule(new Timer.Task(){

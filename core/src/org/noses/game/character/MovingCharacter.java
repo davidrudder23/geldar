@@ -20,7 +20,6 @@ public class MovingCharacter extends Character {
 
 	public MovingCharacter(String spriteFilename, List<TiledMapTileLayer> obstructionLayers, TiledMapTileLayer avatarLayer) {
 		super(spriteFilename, obstructionLayers, avatarLayer);
-
 	}
 
 	public void moveTo(Point point) {
@@ -53,11 +52,15 @@ public class MovingCharacter extends Character {
 		pathStep++;
 		
 		if (pathStep >= path.size()) {
-			path = null;
-			pathStep = 0;
-			movingTask.cancel();
+			stopWalking();
 		}
 		
+	}
+
+	protected void stopWalking() {
+		path = null;
+		pathStep = 0;
+		movingTask.cancel();
 	}
 
 	/**
@@ -115,8 +118,8 @@ public class MovingCharacter extends Character {
 		}
 
 		long end = System.currentTimeMillis();
-		// System.out.println("Getting path from " + from + " to " + to + " took " + (end - start) + " millis");
-		// System.out.println("Called contains " + frontier.getContainsCounter() + " times");
+		System.out.println("Getting path from " + from + " to " + to + " took " + (end - start) + " millis");
+		System.out.println("Called contains " + frontier.getContainsCounter() + " times");
 
 		return frontier.getPath(current);
 	}

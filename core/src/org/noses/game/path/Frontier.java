@@ -7,17 +7,26 @@ public class Frontier {
 
 	List<PathStep> unSteppedSteps;
 	List<PathStep> steppedSteps;
+
+	boolean[][] seen;
 	
 	Point origin = null;
 
 	int containsCounter = 0;
 
 	public Frontier(Point origin) {
-		unSteppedSteps = new ArrayList<>();
-		steppedSteps = new ArrayList<>();
-		
-		this.origin = origin;
-	}
+        unSteppedSteps = new ArrayList<>();
+        steppedSteps = new ArrayList<>();
+
+        this.origin = origin;
+
+        seen = new boolean[1000][1000];
+        for (int x = 0; x < seen.length; x++) {
+            for (int y = 0; y < seen[0].length; y++) {
+                seen[x][y] = false;
+            }
+        }
+    }
 
 	public void add(PathStep pathStep) {
 		if  (origin == null) {
@@ -27,6 +36,8 @@ public class Frontier {
 		if (contains(pathStep.getPoint())) {
 			return;
 		}
+
+		seen[pathStep.getPoint().getX()][pathStep.getPoint().getY()] = true;
 		
 		unSteppedSteps.add(pathStep);
 
@@ -56,7 +67,7 @@ public class Frontier {
 			return false;
 		}
 
-		for (PathStep step : unSteppedSteps) {
+		/*for (PathStep step : unSteppedSteps) {
 			if (step.getPoint().equals(point)) {
 				return true;
 			}
@@ -66,9 +77,9 @@ public class Frontier {
 			if (step.getPoint().equals(point)) {
 				return true;
 			}
-		}
+		}*/
 
-		return false;
+		return seen[point.getX()][point.getY()];
 	}
 
 	public int getContainsCounter() {

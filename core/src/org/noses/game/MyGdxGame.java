@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.noses.game.character.Dragon;
 import org.noses.game.character.MovingCharacter;
 import org.noses.game.path.Point;
 
@@ -39,6 +40,7 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 	private int tilePixelHeight;
 
 	MovingCharacter avatar;
+	List<Dragon> dragons;
 	
 	Map<String,Cell> highlights;
 
@@ -78,6 +80,11 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 //		System.out.println("-----****-----");
 //		System.exit(0);
 
+        dragons = new ArrayList<>();
+        for (int i = 0; i < 50; i++) {
+            dragons.add(new Dragon(getObstructionLayers(), getAvatarLayer()));
+        }
+
 		Gdx.input.setInputProcessor(this);
 	}
 
@@ -86,7 +93,7 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 		for (int x = 0; x < 100; x++) {
 			for (int y = 0; y < 100; y++) {
 			    getAvatarLayer().setCell(x,y, null);
-			    getHighlightLayer().setCell(x,y, null);
+			    //getHighlightLayer().setCell(x,y, null);
 			}
 		}
 		Gdx.gl.glClearColor(1, 0, 0, 1);
@@ -114,7 +121,14 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 	    cell.setTile(new StaticTiledMapTile(avatar.getAnimation()[avatar.getDirection()][avatar.getFrame()]));
 	    TiledMapTileLayer avatarLayer = getAvatarLayer();
 	    avatarLayer.setCell(avatar.getX(), avatar.getY(), cell);
-	    
+
+	    for (Dragon dragon: dragons) {
+            cell = new TiledMapTileLayer.Cell();
+            cell.setTile(new StaticTiledMapTile(dragon.getAnimation()[0][avatar.getFrame()]));
+            TiledMapTileLayer dragonLayer = getAvatarLayer();
+            dragonLayer.setCell(dragon.getX(), dragon.getY(), cell);
+        }
+
 		tiledMapRenderer.setView(camera);
 		tiledMapRenderer.render();
 	}
@@ -251,6 +265,12 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 		int tileY = (int)((camera.viewportHeight-screenY)/tilePixelHeight);
 
 		//System.out.println("tileX="+tileX+", tileY="+tileY);
+        for (int x = 0; x < 100; x++) {
+            for (int y = 0; y < 100; y++) {
+                getHighlightLayer().setCell(x, y, null);
+            }
+        }
+
 		getHighlightLayer().setCell(tileX, tileY, highlights.get("red"));
 		// TODO Auto-generated method stub
 		return false;
@@ -338,8 +358,9 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 	}
 	
 	public int getTileYFromScreenY(int screenY) {
+        int camHeightInTiles = (int)(camera.viewportHeight/2)/tilePixelHeight;
+	    //
 		int tileY = (int)(camera.viewportHeight - screenY)/tilePixelHeight;
-		//float camHeightInTiles = (camera.viewportHeight/2)/tilePixelHeight;
 		return tileY;
 	}
 

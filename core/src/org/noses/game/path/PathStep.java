@@ -28,8 +28,12 @@ public class PathStep {
 		
 		return getPoint().equals(other.getPoint());
 	}
-	
-	
+
+	@Override
+	public int hashCode() {
+		return getPoint().hashCode();
+	}
+
 	@Override
 	public String toString() {
 		return "point="+getPoint()+" cameFrom="+cameFrom;
