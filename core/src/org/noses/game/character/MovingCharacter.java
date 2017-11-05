@@ -26,6 +26,9 @@ public class MovingCharacter extends Character {
 		path = getPath(point);
 		pathStep = 0;
 
+		if ((movingTask != null) && (movingTask.isScheduled())) {
+		    movingTask.cancel();
+        }
 		movingTask = Timer.schedule(new Timer.Task() {
 
 			@Override

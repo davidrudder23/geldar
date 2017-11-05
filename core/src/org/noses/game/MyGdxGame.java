@@ -74,12 +74,7 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
         TiledMapTileLayer.Cell yellow = new TiledMapTileLayer.Cell();
         yellow.setTile(new StaticTiledMapTile(new TextureRegion(new Texture("yellow.png"))));
         highlights.put("yellow", yellow);
-
-//		System.out.println("-----****-----");
-//		System.out.println(avatar.getPath(new Point(90,90)));
-//		System.out.println("-----****-----");
-//		System.exit(0);
-
+        
         dragons = new ArrayList<>();
         for (int i = 0; i < 50; i++) {
             dragons.add(new Dragon(getObstructionLayers(), getAvatarLayer()));
@@ -155,11 +150,6 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
         float camHeightInTiles = (camera.viewportHeight / 2) / tilePixelHeight;
         float camWidthInTiles = (camera.viewportWidth / 2) / tilePixelWidth;
 
-        //System.out.println("camHeightInTiles="+camHeightInTiles);
-        //System.out.println("camWidthInTiles="+camWidthInTiles);
-        //System.out.println("avatar.getX()="+avatar.getX());
-        //System.out.println("avatar.getY()="+avatar.getY());
-
         if (avatar.getX() < camWidthInTiles) camCenterX = camWidthInTiles;
         if (avatar.getY() < camHeightInTiles) camCenterY = camHeightInTiles;
 
@@ -168,9 +158,6 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 
         float bottomBoundary = getAvatarLayer().getHeight() - camHeightInTiles;
         if (avatar.getY() > bottomBoundary) camCenterY = bottomBoundary;
-
-        //System.out.println("camCenterX="+camCenterX);
-        //System.out.println("camCenterY="+camCenterY);
 
         camera.position.set(camCenterX * tilePixelWidth, camCenterY * tilePixelHeight, 0);
 
