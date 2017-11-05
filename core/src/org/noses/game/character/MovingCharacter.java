@@ -50,11 +50,11 @@ public class MovingCharacter extends Character {
 		y = nextPoint.getY();
 
 		pathStep++;
-		
+
 		if (pathStep >= path.size()) {
 			stopWalking();
 		}
-		
+
 	}
 
 	protected void stopWalking() {

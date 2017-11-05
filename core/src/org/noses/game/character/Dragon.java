@@ -25,7 +25,6 @@ public class Dragon extends MovingCharacter {
             point = new Point(x,y);
         } while (isMovementBlocked(point));
 
-        System.out.println("Moving dragon to "+point);
         moveTo(point);
     }
 
