@@ -12,33 +12,36 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
 
-public class MovingCharacter extends Character {
+public abstract class MovingCharacter extends Character {
 
 	private List<Point> path;
 	private int pathStep;
 	private Task movingTask;
 
-	public MovingCharacter(String spriteFilename, List<TiledMapTileLayer> obstructionLayers, TiledMapTileLayer avatarLayer) {
+	protected MovingCharacter(String spriteFilename, List<TiledMapTileLayer> obstructionLayers, TiledMapTileLayer avatarLayer) {
 		super(spriteFilename, obstructionLayers, avatarLayer);
 	}
 
+	protected abstract float getNumPerSecond();
+	
 	public void moveTo(Point point) {
 		path = getPath(point);
 		pathStep = 0;
 
 		if ((movingTask != null) && (movingTask.isScheduled())) {
-		    movingTask.cancel();
-        }
+			movingTask.cancel();
+		}
+		
 		movingTask = Timer.schedule(new Timer.Task() {
 
 			@Override
 			public void run() {
 				walk();
 			}
-		}, 0f, 1 / 5.0f);
+		}, 0f, 1 / getNumPerSecond());
 	}
 
-	public void walk() {
+	private void walk() {
 		if (path == null) {
 			return;
 		}

@@ -10,7 +10,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.utils.Timer;
 
-public class Character {
+public abstract class Character {
     int x;
     int y;
 
@@ -21,7 +21,7 @@ public class Character {
     TextureRegion[][] animation;
 	List<TiledMapTileLayer> obstructionLayers;
 	TiledMapTileLayer avatarLayer;
-    public Character(String spriteFilename, List<TiledMapTileLayer> obstructionLayers, TiledMapTileLayer avatarLayer) {
+    protected Character(String spriteFilename, List<TiledMapTileLayer> obstructionLayers, TiledMapTileLayer avatarLayer) {
     	this.obstructionLayers = obstructionLayers;
     	this.avatarLayer = avatarLayer;
     	

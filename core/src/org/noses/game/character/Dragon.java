@@ -33,4 +33,11 @@ public class Dragon extends MovingCharacter {
         super.stopWalking();
         chooseNextSpot();
     }
+
+
+
+	@Override
+	protected float getNumPerSecond() {
+		return 5;
+	}
 }
