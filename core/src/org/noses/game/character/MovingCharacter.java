@@ -41,7 +41,7 @@ public class MovingCharacter extends Character {
 			return;
 		}
 		Point nextPoint = path.get(pathStep);
-		System.out.println("Next point="+nextPoint);
+		//System.out.println("Next point="+nextPoint);
 		if (isMovementBlocked(nextPoint)) {
 			System.out.println("Can't move because blocked");
 			return;

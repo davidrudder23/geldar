@@ -338,7 +338,7 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 	}
 	
 	public int getTileYFromScreenY(int screenY) {
-		int tileY = screenY/tilePixelHeight;
+		int tileY = (int)(camera.viewportHeight - screenY)/tilePixelHeight;
 		//float camHeightInTiles = (camera.viewportHeight/2)/tilePixelHeight;
 		return tileY;
 	}
