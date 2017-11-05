@@ -8,20 +8,20 @@ public class Frontier {
 	List<PathStep> unSteppedSteps;
 	List<PathStep> steppedSteps;
 	
-	Point destination = null;
+	Point origin = null;
 
 	int containsCounter = 0;
 
-	public Frontier(Point destination) {
+	public Frontier(Point origin) {
 		unSteppedSteps = new ArrayList<>();
 		steppedSteps = new ArrayList<>();
 		
-		this.destination = destination;
+		this.origin = origin;
 	}
 
 	public void add(PathStep pathStep) {
-		if  (destination == null) {
-			destination = pathStep.getPoint();
+		if  (origin == null) {
+			origin = pathStep.getPoint();
 		}
 		
 		if (contains(pathStep.getPoint())) {

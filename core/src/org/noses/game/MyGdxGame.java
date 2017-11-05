@@ -1,6 +1,18 @@
 package org.noses.game;
 
-import com.badlogic.gdx.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.noses.game.character.MovingCharacter;
+import org.noses.game.path.Point;
+
+import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.ApplicationListener;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -17,14 +29,6 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Vector2;
-import org.noses.game.character.Character;
-import org.noses.game.character.MovingCharacter;
-import org.noses.game.path.Point;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class MyGdxGame extends ApplicationAdapter implements ApplicationListener, GestureListener, InputProcessor {
 	private TiledMapRenderer tiledMapRenderer;
@@ -93,15 +97,15 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 		int tileX = Gdx.input.getX()/tilePixelWidth;
 		int tileY = (int)((camera.viewportHeight-Gdx.input.getY())/tilePixelHeight);
 
-		List<Point> path = avatar.getPath(new Point(tileX, tileY));
-		if (path == null) {
-			getHighlightLayer().setCell(tileX, tileY, highlights.get("red"));			
-		} else {
-			for (Point point: path) {
-				getHighlightLayer().setCell(point.getX(), point.getY(), highlights.get("green"));			
-			}
-		}
-		
+//		List<Point> path = avatar.getPath(new Point(tileX, tileY));
+//		if (path == null) {
+//			getHighlightLayer().setCell(tileX, tileY, highlights.get("red"));			
+//		} else {
+//			for (Point point: path) {
+//				getHighlightLayer().setCell(point.getX(), point.getY(), highlights.get("green"));			
+//			}
+//		}
+//		
 		recenterCamera();
 		camera.update();
 
@@ -141,37 +145,6 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 
 		camera.position.set(camCenterX*tilePixelWidth, camCenterY*tilePixelHeight, 0);
 
-	}
-
-	private boolean isCollision(int moveHoriz, int moveVert) {
-		int left = avatar.getX()+moveHoriz;
-		int top = avatar.getY()+moveVert;
-
-		List<TiledMapTileLayer> obstructionLayers = getObstructionLayers();
-
-		for (TiledMapTileLayer ml: obstructionLayers) {
-			if (ml.getCell(left, top) != null) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private boolean isOffScreen(int moveHoriz, int moveVert) {
-		int newTileX = avatar.getX() + moveHoriz;
-		int newTileY = avatar.getY() + moveVert;
-
-		if (newTileX < 0) return true;
-		if (newTileX >= getAvatarLayer().getWidth()) return true;
-		if (newTileY < 0) return true;
-		if (newTileY >= getAvatarLayer().getHeight()) return true;
-
-		return false;
-	}
-	private boolean isMovementBlocked(int moveHoriz, int moveVert) {
-		if (isOffScreen(moveHoriz, moveVert)) return true;
-		if (isCollision(moveHoriz, moveVert)) return true;
-		return false;
 	}
 
 	private List<TiledMapTileLayer> getObstructionLayers() {
@@ -215,28 +188,28 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 	public boolean keyUp(int keycode) {
 		if (keycode == Input.Keys.LEFT) {
             avatar.setDirection(2);
-			if (isMovementBlocked(-1, 0)) {
+			if (avatar.isMovementBlocked(new Point(avatar.getX()-1, avatar.getY()))) {
 				return false;
 			}
 			avatar.moveWest();
 		}
 		if (keycode == Input.Keys.RIGHT){
             avatar.setDirection(1);
-			if (isMovementBlocked(1, 0)) {
+			if (avatar.isMovementBlocked(new Point(avatar.getX()+1, avatar.getY()))) {
 				return false;
 			}
             avatar.moveEast();
 		}
 		if (keycode == Input.Keys.UP){
             avatar.setDirection(3);
-			if (isMovementBlocked(0, 1)) {
+			if (avatar.isMovementBlocked(new Point(avatar.getX(), avatar.getY()+1))) {
 				return false;
 			}
             avatar.moveNorth();
 		}
 		if (keycode == Input.Keys.DOWN){
 			avatar.setDirection(0);
-			if (isMovementBlocked(0, -1)) {
+			if (avatar.isMovementBlocked(new Point(avatar.getX(), avatar.getY()-1))) {
 				return false;
 			}
             avatar.moveSouth();
@@ -260,6 +233,9 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
 		// TODO Auto-generated method stub
+		Point point = new Point(getTileXFromScreenX(screenX), getTileYFromScreenY(screenY));
+		System.out.println("touchUp - "+point);
+		avatar.moveTo(point);
 		return false;
 	}
 
@@ -307,6 +283,7 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 	@Override
 	public boolean tap(float x, float y, int count, int button) {
 		// TODO Auto-generated method stub
+		System.out.println("tap");
 		return false;
 	}
 
@@ -353,4 +330,17 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 		// TODO Auto-generated method stub
 
 	}
+	
+	public int getTileXFromScreenX(int screenX) {
+		int tileX = screenX/tilePixelWidth;
+		//float camHeightInTiles = (camera.viewportHeight/2)/tilePixelHeight;
+		return tileX;
+	}
+	
+	public int getTileYFromScreenY(int screenY) {
+		int tileY = screenY/tilePixelHeight;
+		//float camHeightInTiles = (camera.viewportHeight/2)/tilePixelHeight;
+		return tileY;
+	}
+
 }

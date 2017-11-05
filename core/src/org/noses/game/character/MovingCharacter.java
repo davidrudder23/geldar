@@ -9,50 +9,55 @@ import org.noses.game.path.PathStep;
 import org.noses.game.path.Point;
 
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.utils.Timer;
+import com.badlogic.gdx.utils.Timer.Task;
 
 public class MovingCharacter extends Character {
 
-	private int moveToX;
-	private int moveToY;
+	private List<Point> path;
+	private int pathStep;
+	private Task movingTask;
 
 	public MovingCharacter(String spriteFilename, List<TiledMapTileLayer> obstructionLayers, TiledMapTileLayer avatarLayer) {
 		super(spriteFilename, obstructionLayers, avatarLayer);
 
-		/*
-		 * Timer.schedule(new Timer.Task() {
-		 * 
-		 * @Override public void run() { walk(); } }, 0f, 1/2.0f);
-		 */
 	}
 
-	public void moveTo(int x, int y) {
-		this.moveToX = x;
-		this.moveToY = y;
+	public void moveTo(Point point) {
+		path = getPath(point);
+		pathStep = 0;
+
+		movingTask = Timer.schedule(new Timer.Task() {
+
+			@Override
+			public void run() {
+				walk();
+			}
+		}, 0f, 1 / 5.0f);
 	}
 
 	public void walk() {
-		int randomNum = (int) (Math.random() * 4);
-
-		System.out.println("random=" + randomNum);
-
-		if ((randomNum == 0) && (!isMovementBlocked(getX() - 1, getY()))) {
-			x--;
+		if (path == null) {
 			return;
 		}
-		if ((randomNum == 1) && (!isMovementBlocked(getX(), getY() + 1))) {
-			y++;
+		Point nextPoint = path.get(pathStep);
+		System.out.println("Next point="+nextPoint);
+		if (isMovementBlocked(nextPoint)) {
+			System.out.println("Can't move because blocked");
 			return;
 		}
 
-		if ((randomNum == 2) && (!isMovementBlocked(getX() + 1, getY()))) {
-			x++;
-			return;
-		}
+		x = nextPoint.getX();
+		y = nextPoint.getY();
 
-		if ((randomNum == 3) && (!isMovementBlocked(getX(), getY() - 1))) {
-			y--;
-			return;
+		pathStep++;
+		
+		if (pathStep >= path.size()) {
+			path = null;
+			pathStep = 0;
+			movingTask.cancel();
 		}
+		
 	}
 
 	/**
@@ -88,17 +93,13 @@ public class MovingCharacter extends Character {
 			neighbors.add(new Point(current.getX() + 1, current.getY()));
 
 			/*
-			neighbors.add(new Point(current.getX() - 1, current.getY() - 1));
-			neighbors.add(new Point(current.getX() + 1, current.getY() - 1));
-			neighbors.add(new Point(current.getX() - 1, current.getY() - 1));
-			neighbors.add(new Point(current.getX() - 1, current.getY() + 1));
+			 * neighbors.add(new Point(current.getX() - 1, current.getY() - 1)); neighbors.add(new Point(current.getX() + 1, current.getY() - 1));
+			 * neighbors.add(new Point(current.getX() - 1, current.getY() - 1)); neighbors.add(new Point(current.getX() - 1, current.getY() + 1));
 			 */
-			
+
 			final Point finalCurrent = current;
 
-			neighbors.stream().filter(point -> !isMovementBlocked(point))
-			.map(point -> new PathStep(point, finalCurrent))
-			.forEach(pathStep -> frontier.add(pathStep));
+			neighbors.stream().filter(point -> !isMovementBlocked(point)).map(point -> new PathStep(point, finalCurrent)).forEach(pathStep -> frontier.add(pathStep));
 
 			current = frontier.nextPoint();
 
@@ -106,16 +107,16 @@ public class MovingCharacter extends Character {
 			// System.out.println("current="+current);
 
 			if (current == null) {
-				//long end = System.currentTimeMillis();
-				//System.out.println("Getting null path from " + from + " to " + to + " took " + (end - start) + " millis");
-				//System.out.println("Called null contains " + frontier.getContainsCounter() + " times");
+				// long end = System.currentTimeMillis();
+				// System.out.println("Getting null path from " + from + " to " + to + " took " + (end - start) + " millis");
+				// System.out.println("Called null contains " + frontier.getContainsCounter() + " times");
 				return null;
 			}
 		}
 
 		long end = System.currentTimeMillis();
-		//System.out.println("Getting path from " + from + " to " + to + " took " + (end - start) + " millis");
-		//System.out.println("Called contains " + frontier.getContainsCounter() + " times");
+		// System.out.println("Getting path from " + from + " to " + to + " took " + (end - start) + " millis");
+		// System.out.println("Called contains " + frontier.getContainsCounter() + " times");
 
 		return frontier.getPath(current);
 	}
