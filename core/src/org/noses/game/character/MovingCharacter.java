@@ -71,7 +71,7 @@ public class MovingCharacter extends Character {
 	 * @return
 	 */
 	public List<Point> getPath(Point from, Point to) {
-		long start = System.currentTimeMillis();
+		//long start = System.currentTimeMillis();
 		if (isMovementBlocked(to)) {
 			System.out.println("Movement is blocked");
 			return null;
@@ -117,9 +117,9 @@ public class MovingCharacter extends Character {
 			}
 		}
 
-		long end = System.currentTimeMillis();
-		System.out.println("Getting path from " + from + " to " + to + " took " + (end - start) + " millis");
-		System.out.println("Called contains " + frontier.getContainsCounter() + " times");
+		//long end = System.currentTimeMillis();
+		//System.out.println("Getting path from " + from + " to " + to + " took " + (end - start) + " millis");
+		//System.out.println("Called contains " + frontier.getContainsCounter() + " times");
 
 		return frontier.getPath(current);
 	}
