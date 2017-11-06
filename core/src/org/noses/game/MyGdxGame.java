@@ -8,6 +8,7 @@ import java.util.Map;
 import org.noses.game.character.Avatar;
 import org.noses.game.character.Dragon;
 import org.noses.game.character.MovingCharacter;
+import org.noses.game.hud.HUD;
 import org.noses.game.path.Point;
 
 import com.badlogic.gdx.ApplicationAdapter;
@@ -44,11 +45,19 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
     List<Dragon> dragons;
 
     Map<String, Cell> highlights;
+    
+    HUD hud;
+    
+    int magnification;
 
     @Override
     public void create() {
+        magnification = 0;
+
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
+        
+        hud = new HUD();
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, w, h);
@@ -119,6 +128,8 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 
         tiledMapRenderer.setView(camera);
         tiledMapRenderer.render();
+        
+        hud.render();
     }
 
     private void highlightTheMouse() {
@@ -193,6 +204,11 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 
     @Override
     public void resize(int width, int height) {
+        float w = Gdx.graphics.getWidth();
+        float h = Gdx.graphics.getHeight();
+
+        camera.setToOrtho(false, w, h);
+        camera.update();    
     }
 
     @Override
@@ -231,6 +247,9 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
             }
             avatar.moveSouth();
         }
+        if (keycode == Input.Keys.T) {
+        	hud.toggleDebug();
+        }
 
         return false;
     }
@@ -251,7 +270,6 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         // TODO Auto-generated method stub
         Point point = new Point(getTileXFromScreenX(screenX), getTileYFromScreenY(screenY));
-        System.out.println("touchUp - " + point);
         avatar.moveTo(point);
         return false;
     }
@@ -277,12 +295,14 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 
     @Override
     public boolean scrolled(int amount) {
-        // TODO Auto-generated method stub
+    	magnification += amount;
+
         return false;
     }
 
     @Override
     public void dispose() {
+    	hud.dispose();
     }
 
     @Override
@@ -351,6 +371,8 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
     }
 
     public int getTileXFromScreenX(int screenX) {
+    	
+    	System.out.println("Viewport="+camera.viewportWidth+","+camera.viewportHeight);
         int camWidthInTiles = (int) (camera.viewportWidth / tilePixelWidth);
 
         int tileX = (int) (screenX / tilePixelWidth);
