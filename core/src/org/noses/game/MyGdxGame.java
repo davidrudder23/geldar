@@ -41,7 +41,7 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 	private int tilePixelWidth;
 	private int tilePixelHeight;
 
-	MovingCharacter avatar;
+	Avatar avatar;
 	List<Dragon> dragons;
 
 	Map<String, Cell> highlights;
@@ -129,7 +129,7 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 		tiledMapRenderer.render();
 
 		hud.render();
-	}
+    }
 
 	private void highlightTheMouse() {
 		if (Gdx.input.isButtonPressed(0)) {
@@ -257,7 +257,9 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 		if (keycode == Input.Keys.T) {
 			hud.toggleDebug();
 		}
-
+        if (keycode == Input.Keys.C) {
+            avatar.captured();
+        }
 		return false;
 	}
 
@@ -381,7 +383,7 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 
 	public int getTileXFromScreenX(int screenX) {
 
-		System.out.println("Viewport=" + camera.viewportWidth + "," + camera.viewportHeight);
+		//System.out.println("Viewport=" + camera.viewportWidth + "," + camera.viewportHeight);
 		int camWidthInTiles = (int) (camera.viewportWidth / tilePixelWidth);
 
 		int tileX = (int) (screenX / tilePixelWidth);

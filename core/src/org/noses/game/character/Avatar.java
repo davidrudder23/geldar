@@ -19,6 +19,8 @@ public class Avatar extends MovingCharacter {
 	public Avatar(List<TiledMapTileLayer> obstructionLayers, TiledMapTileLayer avatarLayer) {
 		super("avatar.png", obstructionLayers, avatarLayer);
 
+		canCapture = true;
+		canBeHurt = true;
 		x = 0;
 		y = 0;
 
@@ -35,6 +37,9 @@ public class Avatar extends MovingCharacter {
 	}
 
 	public void captured() {
+		if (!canCapture) {
+			return;
+		}
 		score++;
         canCapture = false;
         
@@ -48,7 +53,7 @@ public class Avatar extends MovingCharacter {
 				canCapture = true;
 				captureTask.cancel();
 			}
-		}, 3, 0);
+		}, 3, 1);
         
 	}
 
