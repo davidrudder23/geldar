@@ -41,17 +41,6 @@ public class Frontier {
 		
 		unSteppedSteps.add(pathStep);
 
-		/*
-		unSteppedSteps.sort((a, b) -> {
-			//System.out.println("destination="+destination);
-			//System.out.println("a="+a.getPoint());
-			//System.out.println("b="+b.getPoint());
-			//System.out.println("a.dis="+a.getPoint().manhattenDistance(destination));
-			//System.out.println("b.dis="+a.getPoint().manhattenDistance(destination));
-			//System.out.println("diff="+(b.getPoint().manhattenDistance(destination) - a.getPoint().manhattenDistance(destination)));
-			return b.getPoint().manhattenDistance(destination) - a.getPoint().manhattenDistance(destination);
-		});
-		*/
 	}
 
 	private void step() {

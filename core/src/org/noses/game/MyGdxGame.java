@@ -5,10 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.utils.Timer;
 import org.noses.game.character.Avatar;
 import org.noses.game.character.Dragon;
 import org.noses.game.character.MovingCharacter;
 import org.noses.game.hud.HUD;
+import org.noses.game.path.MovingCollision;
 import org.noses.game.path.Point;
 
 import com.badlogic.gdx.ApplicationAdapter;
@@ -50,14 +53,24 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 
 	int magnification;
 
-	@Override
+	int timer;
+
+	Sound gameOverSound;
+
+    Timer.Task gameTimer;
+
+    Cell fog;
+
+    @Override
 	public void create() {
 		magnification = 0;
+
+		gameOverSound = Gdx.audio.newSound(Gdx.files.internal("sounds/gameover.wav"));
 
 		float w = Gdx.graphics.getWidth();
 		float h = Gdx.graphics.getHeight();
 
-		hud = new HUD();
+		hud = HUD.getInstance();
 
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, w, h);
@@ -70,6 +83,9 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 		tilePixelHeight = prop.get("tileheight", Integer.class);
 
 		avatar = new Avatar(getObstructionLayers(), getAvatarLayer());
+
+        fog = new TiledMapTileLayer.Cell();
+        fog.setTile(new StaticTiledMapTile(new TextureRegion(new Texture("fog.png"))));
 
 		highlights = new HashMap<>();
 
@@ -90,8 +106,39 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 			dragons.add(new Dragon(getObstructionLayers(), getAvatarLayer()));
 		}
 
+        MovingCollision.getInstance().setAvatar(avatar);
+        MovingCollision.getInstance().setDragons(dragons);
+
 		Gdx.input.setInputProcessor(this);
+
+		startTimer();
 	}
+
+	private void startTimer() {
+	    timer = 60;
+        hud.setTime(timer);
+        gameTimer = Timer.schedule(new Timer.Task() {
+
+            @Override
+            public void run() {
+                timer--;
+                hud.setTime(timer);
+                if (timer <= 0) {
+                    gameOverSound.play();
+                    avatar.disable();
+                    gameTimer.cancel();
+                    for (int x = 0; x < 100; x++) {
+                        for (int y = 0; y < 100; y++) {
+                            //getAvatarLayer().setCell(x, y, null);
+                            getHighlightLayer().setCell(x,y, fog);
+                        }
+                    }
+
+                }
+            }
+        }, 2f, 1 );
+
+    }
 
 	@Override
 	public void render() {

@@ -3,6 +3,7 @@ package org.noses.game.character;
 
 import java.util.List;
 
+import org.noses.game.path.MovingCollision;
 import org.noses.game.path.Point;
 
 import com.badlogic.gdx.graphics.Texture;
@@ -21,6 +22,7 @@ public abstract class Character {
     TextureRegion[][] animation;
 	List<TiledMapTileLayer> obstructionLayers;
 	TiledMapTileLayer avatarLayer;
+
     protected Character(String spriteFilename, List<TiledMapTileLayer> obstructionLayers, TiledMapTileLayer avatarLayer) {
     	this.obstructionLayers = obstructionLayers;
     	this.avatarLayer = avatarLayer;
@@ -46,19 +48,23 @@ public abstract class Character {
     }
     
     public void moveNorth() {
+    	MovingCollision.getInstance().handleCollision();
     	setY(getY()+1);
     }
 
     public void moveSouth() {
-    	setY(getY()-1);
+        MovingCollision.getInstance().handleCollision();
+        setY(getY()-1);
     }
 
     public void moveEast() {
-    	setX(getX()+1);
+        MovingCollision.getInstance().handleCollision();
+        setX(getX()+1);
     }
 
     public void moveWest() {
-    	setX(getX()-1);
+        MovingCollision.getInstance().handleCollision();
+        setX(getX()-1);
     }
 
     public int getX() {

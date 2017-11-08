@@ -12,13 +12,17 @@ public class HUD {
 	private Table table;
 	
 	int score = 0;
+
+	int time = 0;
 	
 	Label scoreLabel;
 	Label timeLabel;
 	
 	boolean debug;
 
-	public HUD () {
+	private static HUD instance;
+
+	private HUD () {
 		stage = new Stage();
 		
 		table = new Table();
@@ -33,6 +37,13 @@ public class HUD {
 		table.add(scoreLabel).expand().top().left();
 		table.add(timeLabel).expand().top().right();
 	}
+
+	public static HUD getInstance() {
+		if (instance == null) {
+			instance = new HUD();
+		}
+		return instance;
+	}
 	
 	public void toggleDebug() {
 		debug = !debug;
@@ -41,6 +52,7 @@ public class HUD {
 	
 	public void render() {
 		scoreLabel.setText(score+"");
+		timeLabel.setText(time+"");
 		stage.act(Gdx.graphics.getDeltaTime());
 		stage.draw();
 		
@@ -48,6 +60,10 @@ public class HUD {
 	
 	public void setScore(int score) {
 		this.score = score;
+	}
+
+	public void setTime(int time) {
+		this.time = time;
 	}
 	
 	public void dispose() {

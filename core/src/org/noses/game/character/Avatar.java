@@ -2,9 +2,13 @@ package org.noses.game.character;
 
 import java.util.List;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
+import org.noses.game.hud.HUD;
+import org.noses.game.path.MovingCollision;
 
 public class Avatar extends MovingCharacter {
 
@@ -16,6 +20,9 @@ public class Avatar extends MovingCharacter {
 
 	private int score;
 
+	Sound captureSound;
+	Sound walkSound;
+
 	public Avatar(List<TiledMapTileLayer> obstructionLayers, TiledMapTileLayer avatarLayer) {
 		super("avatar.png", obstructionLayers, avatarLayer);
 
@@ -25,9 +32,19 @@ public class Avatar extends MovingCharacter {
 		y = 0;
 
 		score = 0;
+
+        captureSound = Gdx.audio.newSound(Gdx.files.internal("sounds/inventory/coin.wav"));
+        walkSound = Gdx.audio.newSound(Gdx.files.internal("sounds/walk.wav"));
+
 	}
 
 	@Override
+    protected void walk() {
+	    walkSound.play(0.5f);
+        super.walk();
+    }
+
+        @Override
 	protected float getNumPerSecond() {
 		return 7;
 	}
@@ -53,7 +70,7 @@ public class Avatar extends MovingCharacter {
 				canCapture = true;
 				captureTask.cancel();
 			}
-		}, 3, 1);
+		}, 1, 1);
         
 	}
 
@@ -73,5 +90,39 @@ public class Avatar extends MovingCharacter {
 			}
 		}, 3, 0);
 	}
+
+	public void collideWith(MovingCharacter collider) {
+		if (!canCapture) {
+			return;
+		}
+
+		if (collider instanceof Dragon) {
+			MovingCollision.getInstance().getDragons().remove(collider);
+			score++;
+
+            HUD.getInstance().setScore(score);
+
+			captureSound.play();
+		}
+
+		captured();
+	}
+
+    @Override
+    public void setX(int x) {
+	    walkSound.play(0.5f);
+        super.setX(x);
+    }
+
+    @Override
+    public void setY(int y) {
+        walkSound.play(0.5f);
+        super.setY(y);
+    }
+
+    public void disable() {
+	    canCapture = false;
+	    canBeHurt = false;
+    }
 
 }

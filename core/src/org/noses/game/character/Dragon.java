@@ -40,4 +40,7 @@ public class Dragon extends MovingCharacter {
 	protected float getNumPerSecond() {
 		return 5;
 	}
+
+    public void collideWith(MovingCharacter collider) {
+    }
 }

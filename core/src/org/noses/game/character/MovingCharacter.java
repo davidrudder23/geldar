@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.noses.game.path.Frontier;
+import org.noses.game.path.MovingCollision;
 import org.noses.game.path.PathStep;
 import org.noses.game.path.Point;
 
@@ -41,7 +42,7 @@ public abstract class MovingCharacter extends Character {
 		}, 0f, 1 / getNumPerSecond());
 	}
 
-	private void walk() {
+	protected void walk() {
 		if (path == null) {
 			return;
 		}
@@ -61,6 +62,8 @@ public abstract class MovingCharacter extends Character {
 			stopWalking();
 		}
 
+		MovingCollision.getInstance().handleCollision();
+
 	}
 
 	protected void stopWalking() {
@@ -68,6 +71,8 @@ public abstract class MovingCharacter extends Character {
 		pathStep = 0;
 		movingTask.cancel();
 	}
+
+	public abstract void collideWith(MovingCharacter collider);
 
 	/**
 	 * Finds the best path from from to to using a simplified djikstra's algo
@@ -108,7 +113,11 @@ public abstract class MovingCharacter extends Character {
 
 			final Point finalCurrent = current;
 
-			neighbors.stream().filter(point -> !isMovementBlocked(point)).map(point -> new PathStep(point, finalCurrent)).forEach(pathStep -> frontier.add(pathStep));
+			neighbors
+                    .stream()
+                    .filter(point -> !isMovementBlocked(point))
+                    .map(point -> new PathStep(point, finalCurrent))
+                    .forEach(pathStep -> frontier.add(pathStep));
 
 			current = frontier.nextPoint();
 
