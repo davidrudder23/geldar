@@ -51,8 +51,8 @@ public class HUD {
 	}
 	
 	public void render() {
-		scoreLabel.setText(score+"");
-		timeLabel.setText(time+"");
+		scoreLabel.setText("Score: "+score);
+		timeLabel.setText("Time: "+time);
 		stage.act(Gdx.graphics.getDeltaTime());
 		stage.draw();
 		

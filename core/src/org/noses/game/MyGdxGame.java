@@ -9,6 +9,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.utils.Timer;
 import org.noses.game.character.Avatar;
 import org.noses.game.character.Dragon;
+import org.noses.game.character.Mage;
 import org.noses.game.character.MovingCharacter;
 import org.noses.game.hud.HUD;
 import org.noses.game.path.MovingCollision;
@@ -45,7 +46,7 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 	private int tilePixelHeight;
 
 	Avatar avatar;
-	List<Dragon> dragons;
+	List<MovingCharacter> movingCharacters;
 
 	Map<String, Cell> highlights;
 
@@ -101,13 +102,17 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 		yellow.setTile(new StaticTiledMapTile(new TextureRegion(new Texture("yellow.png"))));
 		highlights.put("yellow", yellow);
 
-		dragons = new ArrayList<>();
+        movingCharacters = new ArrayList<>();
 		for (int i = 0; i < 50; i++) {
-			dragons.add(new Dragon(getObstructionLayers(), getAvatarLayer()));
+            movingCharacters.add(new Dragon(getObstructionLayers(), getAvatarLayer()));
 		}
 
+        for (int i = 0; i < 50; i++) {
+            movingCharacters.add(new Mage(getObstructionLayers(), getAvatarLayer()));
+        }
+
         MovingCollision.getInstance().setAvatar(avatar);
-        MovingCollision.getInstance().setDragons(dragons);
+        MovingCollision.getInstance().setMovingCharacters(movingCharacters);
 
 		Gdx.input.setInputProcessor(this);
 
@@ -165,11 +170,11 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 		avatarLayer.setCell(avatar.getX(), avatar.getY(), cell);
 
 		// draw dragons
-		for (Dragon dragon : dragons) {
+		for (MovingCharacter movingCharacter: movingCharacters) {
 			cell = new TiledMapTileLayer.Cell();
-			cell.setTile(new StaticTiledMapTile(dragon.getAnimation()[0][avatar.getFrame()]));
+			cell.setTile(new StaticTiledMapTile(movingCharacter.getAnimation()[0][avatar.getFrame()]));
 			TiledMapTileLayer dragonLayer = getAvatarLayer();
-			dragonLayer.setCell(dragon.getX(), dragon.getY(), cell);
+			dragonLayer.setCell(movingCharacter.getX(), movingCharacter.getY(), cell);
 		}
 
 		tiledMapRenderer.setView(camera);
@@ -304,9 +309,6 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 		if (keycode == Input.Keys.T) {
 			hud.toggleDebug();
 		}
-        if (keycode == Input.Keys.C) {
-            avatar.captured();
-        }
 		return false;
 	}
 

@@ -21,7 +21,8 @@ public class Avatar extends MovingCharacter {
 	private int score;
 
 	Sound captureSound;
-	Sound walkSound;
+    Sound walkSound;
+    Sound hurtSound;
 
 	public Avatar(List<TiledMapTileLayer> obstructionLayers, TiledMapTileLayer avatarLayer) {
 		super("avatar.png", obstructionLayers, avatarLayer);
@@ -34,6 +35,7 @@ public class Avatar extends MovingCharacter {
 		score = 0;
 
         captureSound = Gdx.audio.newSound(Gdx.files.internal("sounds/inventory/coin.wav"));
+        hurtSound = Gdx.audio.newSound(Gdx.files.internal("sounds/hurt.wav"));
         walkSound = Gdx.audio.newSound(Gdx.files.internal("sounds/walk.wav"));
 
 	}
@@ -53,24 +55,31 @@ public class Avatar extends MovingCharacter {
 		return canCapture;
 	}
 
-	public void captured() {
+	public void captured(MovingCharacter collider) {
 		if (!canCapture) {
 			return;
 		}
-		score++;
+
+        MovingCollision.getInstance().getMovingCharacters().remove(collider);
+        score++;
+
+        HUD.getInstance().setScore(score);
+
+        captureSound.play();
+
         canCapture = false;
         
         if ((captureTask != null) && (captureTask.isScheduled())) {
         	captureTask.cancel();
         }
-        captureTask = Timer.schedule(new Task() {
+        captureTask = Timer.instance().scheduleTask(new Task() {
 			
 			@Override
 			public void run() {
 				canCapture = true;
 				captureTask.cancel();
 			}
-		}, 1, 1);
+		}, 1);
         
 	}
 
@@ -79,34 +88,36 @@ public class Avatar extends MovingCharacter {
 	}
 
 	public void hurt() {
+	    if(!canBeHurt()) {
+	        return;
+        }
 		score -= 2;
 		canBeHurt = false;
-		hurtTask = Timer.schedule(new Task() {
+
+        if ((hurtTask != null) && (hurtTask.isScheduled())) {
+            hurtTask.cancel();
+        }
+		hurtTask = Timer.instance().scheduleTask(new Task() {
 
 			@Override
 			public void run() {
 				canBeHurt = true;
 				hurtTask.cancel();
 			}
-		}, 3, 0);
-	}
+		}, 3);
+
+        HUD.getInstance().setScore(score);
+
+        hurtSound.play();
+    }
 
 	public void collideWith(MovingCharacter collider) {
-		if (!canCapture) {
-			return;
-		}
-
 		if (collider instanceof Dragon) {
-			MovingCollision.getInstance().getDragons().remove(collider);
-			score++;
-
-            HUD.getInstance().setScore(score);
-
-			captureSound.play();
-		}
-
-		captured();
-	}
+            captured(collider);
+        } else if (collider instanceof Mage) {
+            hurt();
+        }
+    }
 
     @Override
     public void setX(int x) {

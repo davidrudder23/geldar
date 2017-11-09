@@ -11,7 +11,7 @@ public class MovingCollision {
 
     private static MovingCollision instance;
 
-    private List<Dragon> dragons;
+    private List<MovingCharacter> movingCharacters;
 
     private Avatar avatar;
 
@@ -27,23 +27,23 @@ public class MovingCollision {
     }
 
     public void handleCollision() {
-        Optional<Dragon> dragon = dragons.stream()
+        Optional<MovingCharacter> movingCharacter = movingCharacters.stream()
                 .filter(d -> d.getX() == avatar.getX() && d.getY() == avatar.getY())
                 .findFirst();
 
-        if (dragon.isPresent()) {
-            //System.out.println("handling collision of " + dragon + " (" + dragon.get().getX() + "," + dragon.get().getY() + ") with " + avatar + " (" + avatar.getX() + "," + avatar.getY() + ")");
-            avatar.collideWith(dragon.get());
+        if (movingCharacter.isPresent()) {
+            //System.out.println("handling collision of " + movingCharacter + " (" + movingCharacter.get().getX() + "," + movingCharacter.get().getY() + ") with " + avatar + " (" + avatar.getX() + "," + avatar.getY() + ")");
+            avatar.collideWith(movingCharacter.get());
         }
 
     }
 
-    public List<Dragon> getDragons() {
-        return dragons;
+    public List<MovingCharacter> getMovingCharacters() {
+        return movingCharacters;
     }
 
-    public void setDragons(List<Dragon> dragons) {
-        this.dragons = dragons;
+    public void setMovingCharacters(List<MovingCharacter> movingCharacters) {
+        this.movingCharacters = movingCharacters;
     }
 
     public Avatar getAvatar() {
