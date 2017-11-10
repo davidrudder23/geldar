@@ -10,9 +10,6 @@ public class Mage extends MovingCharacter {
     public Mage(List<TiledMapTileLayer> obstructionLayers, TiledMapTileLayer avatarLayer) {
         super("mage.png", obstructionLayers, avatarLayer);
 
-        x=0;
-        y=0;
-
         chooseNextSpot();
     }
 

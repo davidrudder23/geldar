@@ -21,6 +21,10 @@ public abstract class MovingCharacter extends Character {
 
 	protected MovingCharacter(String spriteFilename, List<TiledMapTileLayer> obstructionLayers, TiledMapTileLayer avatarLayer) {
 		super(spriteFilename, obstructionLayers, avatarLayer);
+
+        Point startingPoint = findAGoodSpot();
+        x = startingPoint.getX();
+        y = startingPoint.getY();
 	}
 
 	protected abstract float getNumPerSecond();
@@ -41,6 +45,19 @@ public abstract class MovingCharacter extends Character {
 			}
 		}, 0f, 1 / getNumPerSecond());
 	}
+
+	protected Point findAGoodSpot() {
+	    Point point = null;
+
+	    do {
+            int x = (int)(Math.random()*avatarLayer.getWidth());
+            int y = (int)(Math.random()*avatarLayer.getHeight());
+
+            point = new Point(x,y);
+        } while (isMovementBlocked(point));
+
+	    return point;
+    }
 
 	protected void walk() {
 		if (path == null) {
