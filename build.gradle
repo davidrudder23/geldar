@@ -31,7 +31,7 @@ allprojects {
     apply plugin: "idea"
 
 
-    version = '1.0'
+    version = '0.2'
     ext {
         appName = "gdx-game"
         gdxVersion = '1.9.6'
