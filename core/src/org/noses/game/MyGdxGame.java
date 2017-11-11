@@ -1,25 +1,27 @@
 package org.noses.game;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
-import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.utils.Timer;
 import org.noses.game.character.Avatar;
 import org.noses.game.character.Dragon;
 import org.noses.game.character.Mage;
 import org.noses.game.character.MovingCharacter;
-import org.noses.game.hud.HUD;
 import org.noses.game.path.MovingCollision;
 import org.noses.game.path.Point;
+import org.noses.game.ui.highscore.HighScoreUI;
+import org.noses.game.ui.hud.HUD;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -36,6 +38,7 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Timer;
 
 public class MyGdxGame extends ApplicationAdapter implements ApplicationListener, GestureListener, InputProcessor {
 	private TiledMapRenderer tiledMapRenderer;
@@ -52,18 +55,31 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 
 	HUD hud;
 
+	HighScoreUI highScoreUI;
+
 	int magnification;
 
 	int timer;
 
 	Sound gameOverSound;
 
-    Timer.Task gameTimer;
+	Timer.Task gameTimer;
 
-    Cell fog;
+	Cell fog;
 
-    @Override
+	private Properties properties;
+
+	@Override
 	public void create() {
+
+		properties = new Properties();
+		try {
+			properties.load(Gdx.files.internal("game.properties").read());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		magnification = 0;
 
 		gameOverSound = Gdx.audio.newSound(Gdx.files.internal("sounds/gameover.wav"));
@@ -84,9 +100,8 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 		tilePixelHeight = prop.get("tileheight", Integer.class);
 
 		avatar = new Avatar(getObstructionLayers(), getAvatarLayer());
-
-        fog = new TiledMapTileLayer.Cell();
-        fog.setTile(new StaticTiledMapTile(new TextureRegion(new Texture("fog.png"))));
+		fog = new TiledMapTileLayer.Cell();
+		fog.setTile(new StaticTiledMapTile(new TextureRegion(new Texture("fog.png"))));
 
 		highlights = new HashMap<>();
 
@@ -102,17 +117,17 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 		yellow.setTile(new StaticTiledMapTile(new TextureRegion(new Texture("yellow.png"))));
 		highlights.put("yellow", yellow);
 
-        movingCharacters = new ArrayList<>();
+		movingCharacters = new ArrayList<>();
 		for (int i = 0; i < 50; i++) {
-            movingCharacters.add(new Dragon(getObstructionLayers(), getAvatarLayer()));
+			movingCharacters.add(new Dragon(getObstructionLayers(), getAvatarLayer()));
 		}
 
-        for (int i = 0; i < 50; i++) {
-            movingCharacters.add(new Mage(getObstructionLayers(), getAvatarLayer()));
-        }
+		for (int i = 0; i < 50; i++) {
+			movingCharacters.add(new Mage(getObstructionLayers(), getAvatarLayer()));
+		}
 
-        MovingCollision.getInstance().setAvatar(avatar);
-        MovingCollision.getInstance().setMovingCharacters(movingCharacters);
+		MovingCollision.getInstance().setAvatar(avatar);
+		MovingCollision.getInstance().setMovingCharacters(movingCharacters);
 
 		Gdx.input.setInputProcessor(this);
 
@@ -120,30 +135,37 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 	}
 
 	private void startTimer() {
-	    timer = 60;
-        hud.setTime(timer);
-        gameTimer = Timer.schedule(new Timer.Task() {
+		timer = 10;
+		hud.setTime(timer);
 
-            @Override
-            public void run() {
-                timer--;
-                hud.setTime(timer);
-                if (timer <= 0) {
-                    gameOverSound.play();
-                    avatar.disable();
-                    gameTimer.cancel();
-                    for (int x = 0; x < 100; x++) {
-                        for (int y = 0; y < 100; y++) {
-                            //getAvatarLayer().setCell(x, y, null);
-                            getHighlightLayer().setCell(x,y, fog);
-                        }
-                    }
+		MyGdxGame self = this;
 
-                }
-            }
-        }, 2f, 1 );
+		gameTimer = Timer.schedule(new Timer.Task() {
 
-    }
+			@Override
+			public void run() {
+				timer--;
+				hud.setTime(timer);
+				if (timer <= 0) {
+					gameOverSound.play();
+					avatar.disable();
+					gameTimer.cancel();
+
+					for (int x = 0; x < 100; x++) {
+						for (int y = 0; y < 100; y++) {
+							// getAvatarLayer().setCell(x, y, null);
+							getHighlightLayer().setCell(x, y, fog);
+						}
+
+						highScoreUI = new HighScoreUI(self);
+						highScoreUI.display(getUILayer());
+					}
+
+				}
+			}
+		}, 2f, 1);
+
+	}
 
 	@Override
 	public void render() {
@@ -170,7 +192,7 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 		avatarLayer.setCell(avatar.getX(), avatar.getY(), cell);
 
 		// draw dragons
-		for (MovingCharacter movingCharacter: movingCharacters) {
+		for (MovingCharacter movingCharacter : movingCharacters) {
 			cell = new TiledMapTileLayer.Cell();
 			cell.setTile(new StaticTiledMapTile(movingCharacter.getAnimation()[0][avatar.getFrame()]));
 			TiledMapTileLayer dragonLayer = getAvatarLayer();
@@ -181,7 +203,13 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 		tiledMapRenderer.render();
 
 		hud.render();
-    }
+
+		if (highScoreUI != null) {
+
+			highScoreUI.render();
+		}
+
+	}
 
 	private void highlightTheMouse() {
 		if (Gdx.input.isButtonPressed(0)) {
@@ -236,6 +264,10 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 
 	private TiledMapTileLayer getHighlightLayer() {
 		return getLayersByName("highlight").get(0);
+	}
+
+	private TiledMapTileLayer getUILayer() {
+		return getLayersByName("ui").get(0);
 	}
 
 	private TiledMapTileLayer getAvatarLayer() {
@@ -432,10 +464,10 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 
 	public int getTileXFromScreenX(int screenX) {
 
-		//System.out.println("Viewport=" + camera.viewportWidth + "," + camera.viewportHeight);
+		// System.out.println("Viewport=" + camera.viewportWidth + "," + camera.viewportHeight);
 		int camWidthInTiles = (int) (camera.viewportWidth / tilePixelWidth);
 
-		int tileX = (int) (screenX / tilePixelWidth);
+		int tileX = screenX / tilePixelWidth;
 
 		int offset = avatar.getX() - (camWidthInTiles / 2);
 		if (offset > 0) {
@@ -454,6 +486,14 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 			tileY += offset;
 		}
 		return tileY;
+	}
+
+	public Avatar getAvatar() {
+		return avatar;
+	}
+
+	public String getProperty(String name) {
+		return properties.getProperty(name);
 	}
 
 }

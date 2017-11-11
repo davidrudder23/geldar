@@ -23,6 +23,7 @@ lombok {
 
 dependencies {
     compile "org.projectlombok:lombok:1.14.16"
+    compile 'org.mongodb:mongodb-driver:3.5.0'
 }
 
 allprojects {

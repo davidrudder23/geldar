@@ -7,8 +7,9 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
-import org.noses.game.hud.HUD;
+
 import org.noses.game.path.MovingCollision;
+import org.noses.game.ui.hud.HUD;
 
 public class Avatar extends MovingCharacter {
 
@@ -134,6 +135,10 @@ public class Avatar extends MovingCharacter {
     public void disable() {
 	    canCapture = false;
 	    canBeHurt = false;
+    }
+    
+    public int getScore() {
+    	return score;
     }
 
 }

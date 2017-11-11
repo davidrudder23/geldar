@@ -1,4 +1,4 @@
-package org.noses.game.hud;
+package org.noses.game.ui.hud;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;

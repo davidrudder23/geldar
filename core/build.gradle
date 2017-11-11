@@ -4,6 +4,9 @@ sourceCompatibility = 1.8
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 sourceSets.main.java.srcDirs = [ "src/" ]
+  dependencies {
+    compile 'org.mongodb:mongodb-driver:3.5.0'
+  }
 
 
 eclipse.project {
