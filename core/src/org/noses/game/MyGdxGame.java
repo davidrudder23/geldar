@@ -157,7 +157,7 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 	}
 
 	private void startTimer() {
-		timer = 10;
+		timer = 60;
 		hud.setTime(timer);
 
 		MyGdxGame self = this;
