@@ -19,16 +19,17 @@ public abstract class MovingCharacter extends Character {
 	private int pathStep;
 	private Task movingTask;
 
-	protected MovingCharacter(String spriteFilename, List<TiledMapTileLayer> obstructionLayers, TiledMapTileLayer avatarLayer) {
+	protected MovingCharacter(String spriteFilename, List<TiledMapTileLayer> obstructionLayers,
+			TiledMapTileLayer avatarLayer) {
 		super(spriteFilename, obstructionLayers, avatarLayer);
 
-        Point startingPoint = findAGoodSpot();
-        x = startingPoint.getX();
-        y = startingPoint.getY();
+		Point startingPoint = findAGoodSpot();
+		x = startingPoint.getX();
+		y = startingPoint.getY();
 	}
 
 	protected abstract float getNumPerSecond();
-	
+
 	public void moveTo(Point point) {
 		path = getPath(point);
 		pathStep = 0;
@@ -36,7 +37,7 @@ public abstract class MovingCharacter extends Character {
 		if ((movingTask != null) && (movingTask.isScheduled())) {
 			movingTask.cancel();
 		}
-		
+
 		movingTask = Timer.schedule(new Timer.Task() {
 
 			@Override
@@ -46,25 +47,31 @@ public abstract class MovingCharacter extends Character {
 		}, 0f, 1 / getNumPerSecond());
 	}
 
+	public void stop() {
+		if ((movingTask != null) && (movingTask.isScheduled())) {
+			movingTask.cancel();
+		}
+	}
+
 	protected Point findAGoodSpot() {
-	    Point point = null;
+		Point point = null;
 
-	    do {
-            int x = (int)(Math.random()*avatarLayer.getWidth());
-            int y = (int)(Math.random()*avatarLayer.getHeight());
+		do {
+			int x = (int) (Math.random() * avatarLayer.getWidth());
+			int y = (int) (Math.random() * avatarLayer.getHeight());
 
-            point = new Point(x,y);
-        } while (isMovementBlocked(point));
+			point = new Point(x, y);
+		} while (isMovementBlocked(point));
 
-	    return point;
-    }
+		return point;
+	}
 
 	protected void walk() {
 		if (path == null) {
 			return;
 		}
 		Point nextPoint = path.get(pathStep);
-		//System.out.println("Next point="+nextPoint);
+		// System.out.println("Next point="+nextPoint);
 		if (isMovementBlocked(nextPoint)) {
 			System.out.println("Can't move because blocked");
 			return;
@@ -99,7 +106,7 @@ public abstract class MovingCharacter extends Character {
 	 * @return
 	 */
 	public List<Point> getPath(Point from, Point to) {
-		//long start = System.currentTimeMillis();
+		// long start = System.currentTimeMillis();
 		if (isMovementBlocked(to)) {
 			System.out.println("Movement is blocked");
 			return null;
@@ -124,17 +131,16 @@ public abstract class MovingCharacter extends Character {
 			neighbors.add(new Point(current.getX() + 1, current.getY()));
 
 			/*
-			 * neighbors.add(new Point(current.getX() - 1, current.getY() - 1)); neighbors.add(new Point(current.getX() + 1, current.getY() - 1));
-			 * neighbors.add(new Point(current.getX() - 1, current.getY() - 1)); neighbors.add(new Point(current.getX() - 1, current.getY() + 1));
+			 * neighbors.add(new Point(current.getX() - 1, current.getY() - 1));
+			 * neighbors.add(new Point(current.getX() + 1, current.getY() - 1));
+			 * neighbors.add(new Point(current.getX() - 1, current.getY() - 1));
+			 * neighbors.add(new Point(current.getX() - 1, current.getY() + 1));
 			 */
 
 			final Point finalCurrent = current;
 
-			neighbors
-                    .stream()
-                    .filter(point -> !isMovementBlocked(point))
-                    .map(point -> new PathStep(point, finalCurrent))
-                    .forEach(pathStep -> frontier.add(pathStep));
+			neighbors.stream().filter(point -> !isMovementBlocked(point))
+					.map(point -> new PathStep(point, finalCurrent)).forEach(pathStep -> frontier.add(pathStep));
 
 			current = frontier.nextPoint();
 
@@ -143,15 +149,19 @@ public abstract class MovingCharacter extends Character {
 
 			if (current == null) {
 				// long end = System.currentTimeMillis();
-				// System.out.println("Getting null path from " + from + " to " + to + " took " + (end - start) + " millis");
-				// System.out.println("Called null contains " + frontier.getContainsCounter() + " times");
+				// System.out.println("Getting null path from " + from + " to "
+				// + to + " took " + (end - start) + " millis");
+				// System.out.println("Called null contains " +
+				// frontier.getContainsCounter() + " times");
 				return null;
 			}
 		}
 
-		//long end = System.currentTimeMillis();
-		//System.out.println("Getting path from " + from + " to " + to + " took " + (end - start) + " millis");
-		//System.out.println("Called contains " + frontier.getContainsCounter() + " times");
+		// long end = System.currentTimeMillis();
+		// System.out.println("Getting path from " + from + " to " + to + " took
+		// " + (end - start) + " millis");
+		// System.out.println("Called contains " + frontier.getContainsCounter()
+		// + " times");
 
 		return frontier.getPath(current);
 	}

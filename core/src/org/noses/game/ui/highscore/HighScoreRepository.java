@@ -14,17 +14,36 @@ import com.mongodb.client.MongoDatabase;
 
 public class HighScoreRepository {
 
+	private static HighScoreRepository instance;
+
 	private String password;
 	private MongoClient mongoClient;
 	private MongoDatabase mongoDatabase;
 
-	public HighScoreRepository(String mongoPassword) {
+	private HighScoreRepository(String mongoPassword) {
 		this.password = mongoPassword;
 
 		mongoClient = new MongoClient(new MongoClientURI("mongodb://geldar:" + password
 				+ "@geldar-high-scores-shard-00-00-d506s.mongodb.net:27017,geldar-high-scores-shard-00-01-d506s.mongodb.net:27017,geldar-high-scores-shard-00-02-d506s.mongodb.net:27017/test?ssl=true&replicaSet=Geldar-High-Scores-shard-0&authSource=admin"));
 
 		mongoDatabase = mongoClient.getDatabase("high_scores");
+	}
+
+	/**
+	 * Only use this if you've already called getInstance w/ the password
+	 * 
+	 * @return
+	 */
+	public static HighScoreRepository getInstance() {
+		return instance;
+	}
+
+	public static HighScoreRepository getInstance(String mongoPassword) {
+		if (instance == null) {
+			instance = new HighScoreRepository(mongoPassword);
+		}
+
+		return instance;
 	}
 
 	public void saveScore(String name, int score) {

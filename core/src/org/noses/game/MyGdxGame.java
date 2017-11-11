@@ -14,6 +14,7 @@ import org.noses.game.character.MovingCharacter;
 import org.noses.game.path.MovingCollision;
 import org.noses.game.path.Point;
 import org.noses.game.ui.highscore.HighScoreListUI;
+import org.noses.game.ui.highscore.HighScoreRepository;
 import org.noses.game.ui.highscore.HighScoreUI;
 import org.noses.game.ui.hud.HUD;
 
@@ -66,8 +67,6 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 
 	Timer.Task gameTimer;
 
-	Cell fog;
-
 	private Properties properties;
 
 	@Override
@@ -101,8 +100,6 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 		tilePixelHeight = prop.get("tileheight", Integer.class);
 
 		avatar = new Avatar(getObstructionLayers(), getAvatarLayer());
-		fog = new TiledMapTileLayer.Cell();
-		fog.setTile(new StaticTiledMapTile(new TextureRegion(new Texture("fog.png"))));
 
 		highlights = new HashMap<>();
 
@@ -117,6 +114,30 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 		TiledMapTileLayer.Cell yellow = new TiledMapTileLayer.Cell();
 		yellow.setTile(new StaticTiledMapTile(new TextureRegion(new Texture("yellow.png"))));
 		highlights.put("yellow", yellow);
+
+		HighScoreRepository.getInstance(getMongoPassword());
+
+		startGame();
+	}
+
+	public void stopGame() {
+		avatar.disable();
+		// gameOverSound.play();
+
+		for (MovingCharacter movingCharacter : movingCharacters) {
+			movingCharacter.stop();
+		}
+
+		movingCharacters = new ArrayList<>();
+
+		if (gameTimer != null) {
+			gameTimer.cancel();
+		}
+	}
+
+	public void startGame() {
+
+		avatar.initialize();
 
 		movingCharacters = new ArrayList<>();
 		for (int i = 0; i < 50; i++) {
@@ -148,20 +169,9 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 				timer--;
 				hud.setTime(timer);
 				if (timer <= 0) {
-					gameOverSound.play();
-					avatar.disable();
-					gameTimer.cancel();
+					stopGame();
 
-					for (int x = 0; x < 100; x++) {
-						for (int y = 0; y < 100; y++) {
-							// getAvatarLayer().setCell(x, y, null);
-							getHighlightLayer().setCell(x, y, fog);
-						}
-
-						highScoreUI = new HighScoreUI(self);
-						highScoreUI.display(getUILayer());
-					}
-
+					highScoreUI = new HighScoreUI(self, getUILayer());
 				}
 			}
 		}, 2f, 1);
@@ -315,6 +325,7 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 
 	@Override
 	public boolean keyUp(int keycode) {
+		avatar.stop();
 		if (keycode == Input.Keys.LEFT) {
 			avatar.setDirection(2);
 			if (avatar.isMovementBlocked(new Point(avatar.getX() - 1, avatar.getY()))) {

@@ -3,6 +3,8 @@ package org.noses.game.ui.highscore;
 import org.noses.game.MyGdxGame;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -12,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 public class HighScoreUI {
 	private Stage stage;
@@ -19,34 +22,31 @@ public class HighScoreUI {
 
 	private MyGdxGame parent;
 
-	public HighScoreUI(MyGdxGame parent) {
+	public HighScoreUI(MyGdxGame parent, TiledMapTileLayer layer) {
 		this.parent = parent;
-	}
 
-	public void render() {
-		stage.act(Gdx.graphics.getDeltaTime());
-		stage.draw();
-	}
-
-	public void display(TiledMapTileLayer layer) {
 		stage = new Stage();
 
 		table = new Table();
 		table.setFillParent(true);
+		table.setBackground(new TextureRegionDrawable(new TextureRegion(new Texture("fog.png"))));
+
 		stage.addActor(table);
 
-		table.setDebug(true);
+		// table.setDebug(true);
 
 		Skin skin = new Skin(Gdx.files.internal("skin/rainbow-ui.json"));
-		TextField input = new TextField("Name", skin);
+		TextField input = new TextField("", skin);
 		Button button = new Button(skin);
 		button.addListener(new ChangeListener() {
 
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
 				if (button.isChecked()) {
-					new HighScoreRepository(parent.getProperty("mongo.password")).saveScore(input.getText(),
-							parent.getAvatar().getScore());
+					if ((input.getText() == null) || (input.getText().equals(""))) {
+						return;
+					}
+					HighScoreRepository.getInstance().saveScore(input.getText(), parent.getAvatar().getScore());
 					stage = new Stage();
 					Gdx.input.setInputProcessor(parent);
 
@@ -67,4 +67,8 @@ public class HighScoreUI {
 		Gdx.input.setInputProcessor(stage);
 	}
 
+	public void render() {
+		stage.act(Gdx.graphics.getDeltaTime());
+		stage.draw();
+	}
 }

@@ -52,11 +52,12 @@ public class HighScoreListUI {
 				if (button.isChecked()) {
 					stage = new Stage();
 					Gdx.input.setInputProcessor(parent);
+					parent.startGame();
 				}
 			}
 		});
 
-		List<HighScore> highScores = new HighScoreRepository(parent.getMongoPassword()).getHighScores();
+		List<HighScore> highScores = HighScoreRepository.getInstance().getHighScores();
 
 		highScores.stream().forEach(hs -> {
 			Label name = new Label(hs.getName(), skin);
