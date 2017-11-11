@@ -9,7 +9,6 @@ public class Dragon extends MovingCharacter {
 
     public Dragon(List<TiledMapTileLayer> obstructionLayers, TiledMapTileLayer avatarLayer) {
         super("dragon.png", obstructionLayers, avatarLayer);
-        
 
         chooseNextSpot();
     }
