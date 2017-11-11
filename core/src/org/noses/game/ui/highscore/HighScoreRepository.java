@@ -59,7 +59,7 @@ public class HighScoreRepository {
 
 	public List<HighScore> getHighScores() {
 		MongoCursor<Document> documents = mongoDatabase.getCollection("scores").find()
-				.sort(new BasicDBObject("score", -1)).limit(10).iterator();
+				.sort(new BasicDBObject("datetime", -1)).sort(new BasicDBObject("score", -1)).limit(10).iterator();
 
 		List<HighScore> scores = new ArrayList<>();
 

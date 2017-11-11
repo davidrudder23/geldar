@@ -75,20 +75,16 @@ public class Avatar extends MovingCharacter {
 
 		captureSound.play();
 
-		canCapture = false;
-
-		if ((captureTask != null) && (captureTask.isScheduled())) {
-			captureTask.cancel();
-		}
-		captureTask = Timer.instance().scheduleTask(new Task() {
-
-			@Override
-			public void run() {
-				canCapture = true;
-				captureTask.cancel();
-			}
-		}, 1);
-
+		/*
+		 * canCapture = false;
+		 * 
+		 * if ((captureTask != null) && (captureTask.isScheduled())) {
+		 * captureTask.cancel(); } captureTask =
+		 * Timer.instance().scheduleTask(new Task() {
+		 * 
+		 * @Override public void run() { canCapture = true;
+		 * captureTask.cancel(); } }, 1);
+		 */
 	}
 
 	public boolean canBeHurt() {
@@ -112,7 +108,7 @@ public class Avatar extends MovingCharacter {
 				canBeHurt = true;
 				hurtTask.cancel();
 			}
-		}, 3);
+		}, 2);
 
 		HUD.getInstance().setScore(score);
 
