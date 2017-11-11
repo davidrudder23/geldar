@@ -13,6 +13,7 @@ import org.noses.game.character.Mage;
 import org.noses.game.character.MovingCharacter;
 import org.noses.game.path.MovingCollision;
 import org.noses.game.path.Point;
+import org.noses.game.ui.highscore.HighScoreListUI;
 import org.noses.game.ui.highscore.HighScoreUI;
 import org.noses.game.ui.hud.HUD;
 
@@ -54,8 +55,8 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 	Map<String, Cell> highlights;
 
 	HUD hud;
-
 	HighScoreUI highScoreUI;
+	HighScoreListUI highScoreListUI;
 
 	int magnification;
 
@@ -205,8 +206,11 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 		hud.render();
 
 		if (highScoreUI != null) {
-
 			highScoreUI.render();
+		}
+
+		if (highScoreListUI != null) {
+			highScoreListUI.render();
 		}
 
 	}
@@ -280,7 +284,8 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 		MapLayers mapLayers = tiledMap.getLayers();
 		for (int i = 0; i < mapLayers.getCount(); i++) {
 			MapLayer mapLayer = mapLayers.get(i);
-			if ((mapLayer.getName().toLowerCase().contains(name.toLowerCase())) && (mapLayer instanceof TiledMapTileLayer)) {
+			if ((mapLayer.getName().toLowerCase().contains(name.toLowerCase()))
+					&& (mapLayer instanceof TiledMapTileLayer)) {
 				TiledMapTileLayer tmtl = (TiledMapTileLayer) mapLayer;
 				obstructionLayers.add(tmtl);
 			}
@@ -464,7 +469,8 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 
 	public int getTileXFromScreenX(int screenX) {
 
-		// System.out.println("Viewport=" + camera.viewportWidth + "," + camera.viewportHeight);
+		// System.out.println("Viewport=" + camera.viewportWidth + "," +
+		// camera.viewportHeight);
 		int camWidthInTiles = (int) (camera.viewportWidth / tilePixelWidth);
 
 		int tileX = screenX / tilePixelWidth;
@@ -494,6 +500,17 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 
 	public String getProperty(String name) {
 		return properties.getProperty(name);
+	}
+
+	public String getMongoPassword() {
+		return getProperty("mongo.password");
+	}
+
+	public void displayHighScoreListUI() {
+		highScoreUI = null;
+
+		highScoreListUI = new HighScoreListUI(this);
+		highScoreListUI.display(getUILayer());
 	}
 
 }
