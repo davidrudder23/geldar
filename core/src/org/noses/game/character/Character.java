@@ -48,21 +48,37 @@ public abstract class Character {
     }
     
     public void moveNorth() {
+        setDirection(3);
+        if (isMovementBlocked(new Point(getX(), getY()+1))) {
+            return;
+        }
     	MovingCollision.getInstance().handleCollision();
     	setY(getY()+1);
     }
 
     public void moveSouth() {
+        setDirection(0);
+        if (isMovementBlocked(new Point(getX(), getY()-1))) {
+            return;
+        }
         MovingCollision.getInstance().handleCollision();
         setY(getY()-1);
     }
 
     public void moveEast() {
+        setDirection(1);
+        if (isMovementBlocked(new Point(getX()+1, getY()))) {
+            return;
+        }
         MovingCollision.getInstance().handleCollision();
         setX(getX()+1);
     }
 
     public void moveWest() {
+        setDirection(2);
+        if (isMovementBlocked(new Point(getX()-1, getY()))) {
+            return;
+        }
         MovingCollision.getInstance().handleCollision();
         setX(getX()-1);
     }

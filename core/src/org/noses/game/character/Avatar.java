@@ -55,7 +55,7 @@ public class Avatar extends MovingCharacter {
 	}
 
 	@Override
-	protected float getNumPerSecond() {
+	public float getNumPerSecond() {
 		return 7;
 	}
 

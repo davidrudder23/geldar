@@ -66,6 +66,7 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 	Sound gameOverSound;
 
 	Timer.Task gameTimer;
+	Timer.Task keyPressTimer;
 
 	private Properties properties;
 
@@ -153,7 +154,32 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 
 		Gdx.input.setInputProcessor(this);
 
+		keyPressLoop();
+
 		startTimer();
+	}
+
+	private void keyPressLoop() {
+		keyPressTimer = Timer.schedule(new Timer.Task() {
+
+				@Override
+				public void run() {
+
+					if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+						avatar.moveWest();
+					}
+					if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+						avatar.moveEast();
+					}
+					if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+						avatar.moveNorth();
+					}
+					if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+						avatar.moveSouth();
+					}
+
+				}
+		}, 1, 1/avatar.getNumPerSecond());
 	}
 
 	private void startTimer() {
@@ -326,34 +352,6 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 	@Override
 	public boolean keyUp(int keycode) {
 		avatar.stop();
-		if (keycode == Input.Keys.LEFT) {
-			avatar.setDirection(2);
-			if (avatar.isMovementBlocked(new Point(avatar.getX() - 1, avatar.getY()))) {
-				return false;
-			}
-			avatar.moveWest();
-		}
-		if (keycode == Input.Keys.RIGHT) {
-			avatar.setDirection(1);
-			if (avatar.isMovementBlocked(new Point(avatar.getX() + 1, avatar.getY()))) {
-				return false;
-			}
-			avatar.moveEast();
-		}
-		if (keycode == Input.Keys.UP) {
-			avatar.setDirection(3);
-			if (avatar.isMovementBlocked(new Point(avatar.getX(), avatar.getY() + 1))) {
-				return false;
-			}
-			avatar.moveNorth();
-		}
-		if (keycode == Input.Keys.DOWN) {
-			avatar.setDirection(0);
-			if (avatar.isMovementBlocked(new Point(avatar.getX(), avatar.getY() - 1))) {
-				return false;
-			}
-			avatar.moveSouth();
-		}
 		if (keycode == Input.Keys.T) {
 			hud.toggleDebug();
 		}
