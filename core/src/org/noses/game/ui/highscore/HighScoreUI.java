@@ -50,12 +50,14 @@ public class HighScoreUI {
 					stage = new Stage();
 					Gdx.input.setInputProcessor(parent);
 
-					parent.displayHighScoreListUI();
+					parent.displayHighScoreListUI(input.getText());
 				}
 			}
 		});
 
 		// Add widgets to the table here.
+		table.add(new Label("You scored " + parent.getAvatar().getScore() + " points!", skin));
+		table.row();
 		table.add(new Label("Enter your name for the high score board", skin));
 		table.row();
 

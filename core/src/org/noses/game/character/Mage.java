@@ -1,44 +1,50 @@
 package org.noses.game.character;
 
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import java.util.List;
+
 import org.noses.game.path.Point;
 
-import java.util.List;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 
 public class Mage extends MovingCharacter {
 
-    public Mage(List<TiledMapTileLayer> obstructionLayers, TiledMapTileLayer avatarLayer) {
-        super("mage.png", obstructionLayers, avatarLayer);
+	Avatar avatar;
 
-        chooseNextSpot();
-    }
+	public Mage(Avatar avatar, List<TiledMapTileLayer> obstructionLayers, TiledMapTileLayer avatarLayer) {
+		super("mage.png", obstructionLayers, avatarLayer);
 
-    private void chooseNextSpot() {
-        Point point = null;
-        do {
-            int x = (int)(Math.random()* avatarLayer.getWidth());
-            int y = (int)(Math.random()* avatarLayer.getHeight());
+		this.avatar = avatar;
+		chooseNextSpot();
+	}
 
-            point = new Point(x,y);
-        } while (isMovementBlocked(point));
+	@Override
+	public void chooseNextSpot() {
+		Point point = null;
 
-        moveTo(point);
-    }
+		int randomInt = (int) (Math.random() * 100);
 
-    @Override
-    protected void stopWalking() {
-        super.stopWalking();
-        chooseNextSpot();
-    }
+		if (randomInt < 15) {
 
+			point = new Point(avatar.getX(), avatar.getY());
+		} else {
+			do {
+				int x = (int) (Math.random() * avatarLayer.getWidth());
+				int y = (int) (Math.random() * avatarLayer.getHeight());
 
+				point = new Point(x, y);
+			} while (isMovementBlocked(point));
+		}
+
+		moveTo(point);
+	}
 
 	@Override
 	protected float getNumPerSecond() {
 		return 3;
 	}
 
-    public void collideWith(MovingCharacter collider) {
-        System.out.println("Mage collided");
-    }
+	@Override
+	public void collideWith(MovingCharacter collider) {
+		System.out.println("Mage collided");
+	}
 }
