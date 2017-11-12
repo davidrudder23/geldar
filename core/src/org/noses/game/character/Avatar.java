@@ -2,6 +2,8 @@ package org.noses.game.character;
 
 import java.util.List;
 
+import org.noses.game.GeldarGame;
+import org.noses.game.item.Item;
 import org.noses.game.path.MovingCollision;
 import org.noses.game.ui.hud.HUD;
 
@@ -25,8 +27,8 @@ public class Avatar extends MovingCharacter {
 	Sound walkSound;
 	Sound hurtSound;
 
-	public Avatar(List<TiledMapTileLayer> obstructionLayers, TiledMapTileLayer avatarLayer) {
-		super("avatar.png", obstructionLayers, avatarLayer);
+	public Avatar(GeldarGame parent) {
+		super("avatar.png", parent);
 
 		captureSound = Gdx.audio.newSound(Gdx.files.internal("sounds/inventory/coin.wav"));
 		hurtSound = Gdx.audio.newSound(Gdx.files.internal("sounds/hurt.wav"));
@@ -128,6 +130,12 @@ public class Avatar extends MovingCharacter {
 			hurt();
 		}
 	}
+
+	@Override
+	public void collideWith(Item item) {
+		// don't do anything right now
+	}
+
 
 	@Override
 	public void setX(int x) {

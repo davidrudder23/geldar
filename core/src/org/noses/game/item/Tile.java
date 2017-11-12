@@ -8,6 +8,8 @@ import org.noses.game.path.Point;
 public class Tile {
 
     TextureRegion[] animation;
+
+    // This is the point _relative to the item's point_
     Point point;
 
     int frame = 0;
@@ -35,14 +37,14 @@ public class Tile {
     }
 
     public void nextFrame() {
-        frame = (frame+1)%animation.length;
+        frame = (frame + 1) % animation.length;
     }
 
-    public void render(TiledMapTileLayer layer) {
+    public void render(Point origin, TiledMapTileLayer layer) {
         TiledMapTileLayer.Cell cell = new TiledMapTileLayer.Cell();
 
         cell.setTile(new StaticTiledMapTile(animation[frame]));
-        layer.setCell(point.getX(), point.getY(), cell);
+        layer.setCell(origin.getX() + point.getX(), origin.getY() + point.getY(), cell);
     }
 
     public boolean canRender(TiledMapTileLayer layer) {

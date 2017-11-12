@@ -11,6 +11,8 @@ import org.noses.game.character.Avatar;
 import org.noses.game.character.Dragon;
 import org.noses.game.character.Mage;
 import org.noses.game.character.MovingCharacter;
+import org.noses.game.item.Item;
+import org.noses.game.item.Vent;
 import org.noses.game.path.MovingCollision;
 import org.noses.game.path.Point;
 import org.noses.game.ui.highscore.HighScoreListUI;
@@ -42,7 +44,7 @@ import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Timer;
 
-public class MyGdxGame extends ApplicationAdapter implements ApplicationListener, GestureListener, InputProcessor {
+public class GeldarGame extends ApplicationAdapter implements ApplicationListener, GestureListener, InputProcessor {
 	private TiledMapRenderer tiledMapRenderer;
 	private TiledMap tiledMap;
 	private OrthographicCamera camera;
@@ -50,8 +52,11 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 	private int tilePixelWidth;
 	private int tilePixelHeight;
 
+	TiledMapTileLayer avatarLayer;
+
 	Avatar avatar;
 	List<MovingCharacter> movingCharacters;
+	List<Item> items;
 
 	Map<String, Cell> highlights;
 
@@ -100,8 +105,6 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 		tilePixelWidth = prop.get("tilewidth", Integer.class);
 		tilePixelHeight = prop.get("tileheight", Integer.class);
 
-		avatar = new Avatar(getObstructionLayers(), getAvatarLayer());
-
 		highlights = new HashMap<>();
 
 		TiledMapTileLayer.Cell red = new TiledMapTileLayer.Cell();
@@ -121,6 +124,40 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 		startGame();
 	}
 
+	public void startGame() {
+
+		items = new ArrayList<>();
+		for (int x = 0; x < 100; x+=5) {
+			for (int y = 0; y < 100; y+=5) {
+				items.add(new Vent(this, new Point(x,y)));
+			}
+		}
+
+		avatar = new Avatar(this);
+
+		avatar.initialize();
+
+		movingCharacters = new ArrayList<>();
+		for (int i = 0; i < 50; i++) {
+			movingCharacters.add(new Dragon(this));
+		}
+
+		for (int i = 0; i < 50; i++) {
+			movingCharacters.add(new Mage(avatar, this));
+		}
+
+		MovingCollision.getInstance().setAvatar(avatar);
+		MovingCollision.getInstance().setMovingCharacters(movingCharacters);
+
+		MovingCollision.getInstance().setItems(items);
+
+		Gdx.input.setInputProcessor(this);
+
+		keyPressLoop();
+
+		startTimer();
+	}
+
 	public void stopGame() {
 		avatar.disable();
 		// gameOverSound.play();
@@ -134,33 +171,11 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 		if (gameTimer != null) {
 			gameTimer.cancel();
 		}
+
 	}
 
 	public void restartGame() {
 		System.exit(0);
-	}
-
-	public void startGame() {
-
-		avatar.initialize();
-
-		movingCharacters = new ArrayList<>();
-		for (int i = 0; i < 50; i++) {
-			movingCharacters.add(new Dragon(getObstructionLayers(), getAvatarLayer()));
-		}
-
-		for (int i = 0; i < 50; i++) {
-			movingCharacters.add(new Mage(avatar, getObstructionLayers(), getAvatarLayer()));
-		}
-
-		MovingCollision.getInstance().setAvatar(avatar);
-		MovingCollision.getInstance().setMovingCharacters(movingCharacters);
-
-		Gdx.input.setInputProcessor(this);
-
-		keyPressLoop();
-
-		startTimer();
 	}
 
 	private void keyPressLoop() {
@@ -190,7 +205,7 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 		timer = 10;
 		hud.setTime(timer);
 
-		MyGdxGame self = this;
+		GeldarGame self = this;
 
 		gameTimer = Timer.schedule(new Timer.Task() {
 
@@ -210,15 +225,20 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 
 	@Override
 	public void render() {
-		for (int x = 0; x < 100; x++) {
-			for (int y = 0; y < 100; y++) {
+		for (int x = 0; x < getAvatarLayer().getWidth(); x++) {
+			for (int y = 0; y < getAvatarLayer().getHeight(); y++) {
 				getAvatarLayer().setCell(x, y, null);
-				// getHighlightLayer().setCell(x,y, null);
 			}
 		}
 		Gdx.gl.glClearColor(1, 0, 0, 1);
 		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+		if (items != null) {
+			for (Item item : items) {
+				item.render(getUILayer());
+			}
+		}
 
 		// Highlight the mouse
 		highlightTheMouse();
@@ -302,21 +322,28 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 
 	}
 
-	private List<TiledMapTileLayer> getObstructionLayers() {
+	public List<TiledMapTileLayer> getObstructionLayers() {
 		return getLayersByName("obstruction");
 	}
 
-	private TiledMapTileLayer getHighlightLayer() {
+	public TiledMapTileLayer getHighlightLayer() {
 		return getLayersByName("highlight").get(0);
 	}
 
-	private TiledMapTileLayer getUILayer() {
+	public TiledMapTileLayer getUILayer() {
 		return getLayersByName("ui").get(0);
 	}
 
-	private TiledMapTileLayer getAvatarLayer() {
-		List<TiledMapTileLayer> avatarLayers = getLayersByName("walking");
-		return avatarLayers.get(0);
+	public TiledMapTileLayer getAvatarLayer() {
+		if (avatarLayer == null) {
+			List<TiledMapTileLayer> avatarLayers = getLayersByName("walking");
+			avatarLayer = avatarLayers.get(0);
+		}
+		return avatarLayer;
+	}
+
+	public List<Item> getItems() {
+		return items;
 	}
 
 	private List<TiledMapTileLayer> getLayersByName(String name) {

@@ -2,14 +2,16 @@ package org.noses.game.character;
 
 import java.util.List;
 
+import org.noses.game.GeldarGame;
+import org.noses.game.item.Item;
 import org.noses.game.path.Point;
 
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 
 public class Dragon extends MovingCharacter {
 
-	public Dragon(List<TiledMapTileLayer> obstructionLayers, TiledMapTileLayer avatarLayer) {
-		super("dragon.png", obstructionLayers, avatarLayer);
+	public Dragon(GeldarGame parent) {
+		super("dragon.png", parent);
 
 		chooseNextSpot();
 	}
@@ -18,8 +20,8 @@ public class Dragon extends MovingCharacter {
 	public void chooseNextSpot() {
 		Point point = null;
 		do {
-			int x = (int) (Math.random() * avatarLayer.getWidth());
-			int y = (int) (Math.random() * avatarLayer.getHeight());
+			int x = (int) (Math.random() * parent.getAvatarLayer().getWidth());
+			int y = (int) (Math.random() * parent.getAvatarLayer().getHeight());
 
 			point = new Point(x, y);
 		} while (isMovementBlocked(point));
@@ -35,4 +37,10 @@ public class Dragon extends MovingCharacter {
 	@Override
 	public void collideWith(MovingCharacter collider) {
 	}
+
+	@Override
+	public void collideWith(Item item) {
+		// don't do anything right now
+	}
+
 }

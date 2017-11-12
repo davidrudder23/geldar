@@ -1,6 +1,6 @@
 package org.noses.game.ui.highscore;
 
-import org.noses.game.MyGdxGame;
+import org.noses.game.GeldarGame;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -20,9 +20,9 @@ public class HighScoreUI {
 	private Stage stage;
 	private Table table;
 
-	private MyGdxGame parent;
+	private GeldarGame parent;
 
-	public HighScoreUI(MyGdxGame parent, TiledMapTileLayer layer) {
+	public HighScoreUI(GeldarGame parent, TiledMapTileLayer layer) {
 		this.parent = parent;
 
 		stage = new Stage();

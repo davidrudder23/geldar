@@ -2,7 +2,7 @@ package org.noses.game.ui.highscore;
 
 import java.util.List;
 
-import org.noses.game.MyGdxGame;
+import org.noses.game.GeldarGame;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -23,10 +23,10 @@ public class HighScoreListUI {
 	private Stage stage;
 	private Table table;
 
-	private MyGdxGame parent;
+	private GeldarGame parent;
 	private String playerName;
 
-	public HighScoreListUI(MyGdxGame parent, String playerName) {
+	public HighScoreListUI(GeldarGame parent, String playerName) {
 		this.parent = parent;
 		this.playerName = playerName;
 	}
@@ -37,6 +37,8 @@ public class HighScoreListUI {
 	}
 
 	public void display(TiledMapTileLayer layer) {
+		Skin skin = new Skin(Gdx.files.internal("skin/rainbow-ui.json"));
+
 		stage = new Stage();
 
 		table = new Table();
@@ -44,9 +46,14 @@ public class HighScoreListUI {
 		table.setBackground(new TextureRegionDrawable(new TextureRegion(new Texture("fog.png"))));
 		stage.addActor(table);
 
+		Label title = new Label("High Scores", skin);
+		title.setFontScale(2.5f);
+
+		table.add(title).colspan(2);
+		table.row();
+
 		// table.setDebug(true);
 
-		Skin skin = new Skin(Gdx.files.internal("skin/rainbow-ui.json"));
 		Label ok = new Label("Okay", skin);
 		Button button = new Button(ok, skin);
 		button.addListener(new ChangeListener() {
