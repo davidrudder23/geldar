@@ -33,7 +33,7 @@ allprojects {
 
     version = '0.2'
     ext {
-        appName = "gdx-game"
+        appName = "geldar"
         gdxVersion = '1.9.6'
         roboVMVersion = '2.3.1'
         box2DLightsVersion = '1.4'
