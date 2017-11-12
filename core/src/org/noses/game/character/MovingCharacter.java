@@ -31,12 +31,10 @@ public abstract class MovingCharacter extends Character {
 	protected abstract float getNumPerSecond();
 
 	public void moveTo(Point point) {
+		stopWalking();
+
 		path = getPath(point);
 		pathStep = 0;
-
-		if ((movingTask != null) && (movingTask.isScheduled())) {
-			movingTask.cancel();
-		}
 
 		movingTask = Timer.schedule(new Timer.Task() {
 
@@ -48,9 +46,7 @@ public abstract class MovingCharacter extends Character {
 	}
 
 	public void stop() {
-		if ((movingTask != null) && (movingTask.isScheduled())) {
-			movingTask.cancel();
-		}
+		stopWalking();
 	}
 
 	protected Point findAGoodSpot() {
@@ -65,6 +61,8 @@ public abstract class MovingCharacter extends Character {
 
 		return point;
 	}
+
+	public abstract void chooseNextSpot();
 
 	protected void walk() {
 		if (path == null) {
@@ -84,6 +82,7 @@ public abstract class MovingCharacter extends Character {
 
 		if (pathStep >= path.size()) {
 			stopWalking();
+			chooseNextSpot();
 		}
 
 		MovingCollision.getInstance().handleCollision();
@@ -93,7 +92,9 @@ public abstract class MovingCharacter extends Character {
 	protected void stopWalking() {
 		path = null;
 		pathStep = 0;
-		movingTask.cancel();
+		if ((movingTask != null) && (movingTask.isScheduled())) {
+			movingTask.cancel();
+		}
 	}
 
 	public abstract void collideWith(MovingCharacter collider);

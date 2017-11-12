@@ -136,6 +136,10 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 		}
 	}
 
+	public void restartGame() {
+		System.exit(0);
+	}
+
 	public void startGame() {
 
 		avatar.initialize();
@@ -146,7 +150,7 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 		}
 
 		for (int i = 0; i < 50; i++) {
-			movingCharacters.add(new Mage(getObstructionLayers(), getAvatarLayer()));
+			movingCharacters.add(new Mage(avatar, getObstructionLayers(), getAvatarLayer()));
 		}
 
 		MovingCollision.getInstance().setAvatar(avatar);
@@ -162,28 +166,28 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 	private void keyPressLoop() {
 		keyPressTimer = Timer.schedule(new Timer.Task() {
 
-				@Override
-				public void run() {
+			@Override
+			public void run() {
 
-					if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-						avatar.moveWest();
-					}
-					if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-						avatar.moveEast();
-					}
-					if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-						avatar.moveNorth();
-					}
-					if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-						avatar.moveSouth();
-					}
-
+				if ((Gdx.input.isKeyPressed(Input.Keys.LEFT)) || (Gdx.input.isKeyPressed(Input.Keys.A))) {
+					avatar.moveWest();
 				}
-		}, 1, 1/avatar.getNumPerSecond());
+				if ((Gdx.input.isKeyPressed(Input.Keys.RIGHT)) || (Gdx.input.isKeyPressed(Input.Keys.D))) {
+					avatar.moveEast();
+				}
+				if ((Gdx.input.isKeyPressed(Input.Keys.UP)) || (Gdx.input.isKeyPressed(Input.Keys.W))) {
+					avatar.moveNorth();
+				}
+				if ((Gdx.input.isKeyPressed(Input.Keys.DOWN)) || (Gdx.input.isKeyPressed(Input.Keys.S))) {
+					avatar.moveSouth();
+				}
+
+			}
+		}, 1, 1 / avatar.getNumPerSecond());
 	}
 
 	private void startTimer() {
-		timer = 60;
+		timer = 10;
 		hud.setTime(timer);
 
 		MyGdxGame self = this;
@@ -515,10 +519,10 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 		return getProperty("mongo.password");
 	}
 
-	public void displayHighScoreListUI() {
+	public void displayHighScoreListUI(String name) {
 		highScoreUI = null;
 
-		highScoreListUI = new HighScoreListUI(this);
+		highScoreListUI = new HighScoreListUI(this, name);
 		highScoreListUI.display(getUILayer());
 	}
 
