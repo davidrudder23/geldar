@@ -39,4 +39,9 @@ public class Vent extends Item {
     }
 
 
+    @Override
+    public boolean touchUp(int button) {
+        System.out.println("Vent touch up");
+        return super.touchUp(button);
+    }
 }

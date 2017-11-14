@@ -108,4 +108,15 @@ public abstract class Item {
     public String toString() {
         return tiles.length+"x"+tiles[0].length+" tile";
     }
+
+    public boolean touchDown(int button) {
+        System.out.println (this+" touch down");
+        return true;
+    }
+
+    public boolean touchUp(int button) {
+        System.out.println (this+" touch up");
+        return true;
+    }
+
 }

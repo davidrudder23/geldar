@@ -45,6 +45,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Timer;
 
 public class GeldarGame extends ApplicationAdapter implements ApplicationListener, GestureListener, InputProcessor {
+    private static final int GAME_LENGTH_IN_SECONDS = 60;
+
 	private TiledMapRenderer tiledMapRenderer;
 	private TiledMap tiledMap;
 	private OrthographicCamera camera;
@@ -202,7 +204,7 @@ public class GeldarGame extends ApplicationAdapter implements ApplicationListene
 	}
 
 	private void startTimer() {
-		timer = 10;
+		timer = GAME_LENGTH_IN_SECONDS;
 		hud.setTime(timer);
 
 		GeldarGame self = this;
@@ -397,15 +399,27 @@ public class GeldarGame extends ApplicationAdapter implements ApplicationListene
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		// TODO Auto-generated method stub
-		return false;
+        Point point = getTilePointFromScreenXY(screenX, screenY);
+        for (Item item: items) {
+            if (item.occupies(point)) {
+                if (item.touchDown(button)) {
+                    return true;
+                }
+            }
+        }
+        return false;
 	}
 
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-		// TODO Auto-generated method stub
-		Point point = new Point(getTileXFromScreenX(screenX), getTileYFromScreenY(screenY));
-		avatar.moveTo(point);
+        Point point = getTilePointFromScreenXY(screenX, screenY);
+	    for (Item item: items) {
+            if (item.occupies(point)) {
+                if (item.touchUp(button)) {
+                    return true;
+                }
+            }
+        }
 		return false;
 	}
 
@@ -533,6 +547,10 @@ public class GeldarGame extends ApplicationAdapter implements ApplicationListene
 		}
 		return tileY;
 	}
+
+    public Point getTilePointFromScreenXY(int screenX, int screenY) {
+       return new Point(getTileXFromScreenX(screenX), getTileYFromScreenY(screenY));
+    }
 
 	public Avatar getAvatar() {
 		return avatar;
