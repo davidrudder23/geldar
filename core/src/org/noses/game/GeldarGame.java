@@ -12,7 +12,6 @@ import org.noses.game.character.Dragon;
 import org.noses.game.character.Mage;
 import org.noses.game.character.MovingCharacter;
 import org.noses.game.item.Item;
-import org.noses.game.item.Vent;
 import org.noses.game.path.MovingCollision;
 import org.noses.game.path.Point;
 import org.noses.game.ui.highscore.HighScoreListUI;
@@ -39,13 +38,13 @@ import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Timer;
 
 public class GeldarGame extends ApplicationAdapter implements ApplicationListener, GestureListener, InputProcessor {
-    private static final int GAME_LENGTH_IN_SECONDS = 60;
+	private static final int GAME_LENGTH_IN_SECONDS = 60;
 
 	private TiledMapRenderer tiledMapRenderer;
 	private TiledMap tiledMap;
@@ -100,8 +99,8 @@ public class GeldarGame extends ApplicationAdapter implements ApplicationListene
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, w, h);
 		camera.update();
-		tiledMap = new TmxMapLoader().load("game.tmx");
-		tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
+		tiledMap = new TmxMapLoader().load("geldar.tmx");
+		tiledMapRenderer = new IsometricTiledMapRenderer(tiledMap);
 
 		MapProperties prop = tiledMap.getProperties();
 		tilePixelWidth = prop.get("tilewidth", Integer.class);
@@ -129,15 +128,16 @@ public class GeldarGame extends ApplicationAdapter implements ApplicationListene
 	public void startGame() {
 
 		items = new ArrayList<>();
-		for (int x = 0; x < 100; x+=5) {
-			for (int y = 0; y < 100; y+=5) {
-				items.add(new Vent(this, new Point(x,y)));
-			}
-		}
+		/*
+		 * for (int x = 0; x < 100; x += 5) { for (int y = 0; y < 100; y += 5) {
+		 * items.add(new Vent(this, new Point(x, y))); } }
+		 */
 
 		avatar = new Avatar(this);
 
 		avatar.initialize();
+		avatar.setX(0);
+		avatar.setY(0);
 
 		movingCharacters = new ArrayList<>();
 		for (int i = 0; i < 50; i++) {
@@ -286,12 +286,12 @@ public class GeldarGame extends ApplicationAdapter implements ApplicationListene
 					highlightLayer.setCell(x, y, null);
 				}
 			}
-			int tileX = getTileXFromScreenX(Gdx.input.getX());
-			int tileY = getTileYFromScreenY(Gdx.input.getY());
 
-			List<Point> path = avatar.getPath(new Point(tileX, tileY));
+			Point mousePoint = getPointFromScreenXY(Gdx.input.getX(), Gdx.input.getY());
+
+			List<Point> path = avatar.getPath(mousePoint);
 			if (path == null) {
-				highlightLayer.setCell(tileX, tileY, highlights.get("red"));
+				highlightLayer.setCell(mousePoint.getX(), mousePoint.getY(), highlights.get("red"));
 			} else {
 				for (Point point : path) {
 					highlightLayer.setCell(point.getX(), point.getY(), highlights.get("green"));
@@ -321,6 +321,8 @@ public class GeldarGame extends ApplicationAdapter implements ApplicationListene
 			camCenterY = bottomBoundary;
 
 		camera.position.set(camCenterX * tilePixelWidth, camCenterY * tilePixelHeight, 0);
+
+		camera.position.set(0, 0, 10);
 
 	}
 
@@ -399,27 +401,27 @@ public class GeldarGame extends ApplicationAdapter implements ApplicationListene
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        Point point = getTilePointFromScreenXY(screenX, screenY);
-        for (Item item: items) {
-            if (item.occupies(point)) {
-                if (item.touchDown(button)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+		Point point = getPointFromScreenXY(screenX, screenY);
+		for (Item item : items) {
+			if (item.occupies(point)) {
+				if (item.touchDown(button)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        Point point = getTilePointFromScreenXY(screenX, screenY);
-	    for (Item item: items) {
-            if (item.occupies(point)) {
-                if (item.touchUp(button)) {
-                    return true;
-                }
-            }
-        }
+		Point point = getPointFromScreenXY(screenX, screenY);
+		for (Item item : items) {
+			if (item.occupies(point)) {
+				if (item.touchUp(button)) {
+					return true;
+				}
+			}
+		}
 		return false;
 	}
 
@@ -437,7 +439,8 @@ public class GeldarGame extends ApplicationAdapter implements ApplicationListene
 			}
 		}
 
-		getHighlightLayer().setCell(getTileXFromScreenX(screenX), getTileYFromScreenY(screenY), highlights.get("red"));
+		Point mousePoint = getPointFromScreenXY(screenX, screenY);
+		getHighlightLayer().setCell(mousePoint.getX(), mousePoint.getY(), highlights.get("red"));
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -521,36 +524,17 @@ public class GeldarGame extends ApplicationAdapter implements ApplicationListene
 
 	}
 
-	public int getTileXFromScreenX(int screenX) {
+	public Point getPointFromScreenXY(final int screenX, int screenY) {
+		// screenY = (int) (camera.viewportHeight - screenY);
+		final int tileWidthHalf = tilePixelWidth / 2;
+		final int tileHeightHalf = tilePixelHeight / 2;
 
-		// System.out.println("Viewport=" + camera.viewportWidth + "," +
-		// camera.viewportHeight);
-		int camWidthInTiles = (int) (camera.viewportWidth / tilePixelWidth);
+		final int tileX = (screenX / tileWidthHalf + screenY / tileHeightHalf) / 2
+				- (int) (camera.viewportWidth / tilePixelWidth);
+		final int tileY = 0 - ((screenY / tileHeightHalf - (screenX / tileWidthHalf)) / 2);
 
-		int tileX = screenX / tilePixelWidth;
-
-		int offset = avatar.getX() - (camWidthInTiles / 2);
-		if (offset > 0) {
-			tileX += offset;
-		}
-
-		return tileX;
+		return new Point(tileX, tileY);
 	}
-
-	public int getTileYFromScreenY(int screenY) {
-		int camHeightInTiles = (int) (camera.viewportHeight / tilePixelHeight);
-		int tileY = (int) (camera.viewportHeight - screenY) / tilePixelHeight;
-
-		int offset = avatar.getY() - (camHeightInTiles / 2);
-		if (offset > 0) {
-			tileY += offset;
-		}
-		return tileY;
-	}
-
-    public Point getTilePointFromScreenXY(int screenX, int screenY) {
-       return new Point(getTileXFromScreenX(screenX), getTileYFromScreenY(screenY));
-    }
 
 	public Avatar getAvatar() {
 		return avatar;
