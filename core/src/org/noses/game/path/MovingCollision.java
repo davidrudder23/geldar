@@ -37,6 +37,15 @@ public class MovingCollision {
         if (movingCharacter.isPresent()) {
             avatar.collideWith(movingCharacter.get());
         }
+
+        Optional<Item> collidedItem = items.stream()
+                .filter(i->i.occupies(new Point(avatar.getX(), avatar.getY())))
+                .findFirst();
+
+        if (collidedItem.isPresent()) {
+            avatar.collideWith(collidedItem.get());
+        }
+
     }
 
     public List<MovingCharacter> getMovingCharacters() {
