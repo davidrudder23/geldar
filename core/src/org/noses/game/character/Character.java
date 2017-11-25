@@ -33,7 +33,7 @@ public abstract class Character {
         frame = 0;
 
         Texture avatarAnimationSheet = new Texture(spriteFilename);
-        animation = TextureRegion.split(avatarAnimationSheet, avatarAnimationSheet.getWidth() / 4, avatarAnimationSheet.getHeight() / 4);
+        animation = TextureRegion.split(avatarAnimationSheet, (int)avatarLayer.getTileWidth(), (int)avatarLayer.getTileHeight());
 
         Timer.schedule(new Timer.Task(){
                            @Override

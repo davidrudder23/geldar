@@ -187,7 +187,7 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 	}
 
 	private void startTimer() {
-		timer = 10;
+		timer = 60;
 		hud.setTime(timer);
 
 		MyGdxGame self = this;
@@ -235,7 +235,7 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 		// draw dragons
 		for (MovingCharacter movingCharacter : movingCharacters) {
 			cell = new TiledMapTileLayer.Cell();
-			cell.setTile(new StaticTiledMapTile(movingCharacter.getAnimation()[0][avatar.getFrame()]));
+			cell.setTile(new StaticTiledMapTile(movingCharacter.getAnimation()[0][movingCharacter.getFrame()]));
 			TiledMapTileLayer dragonLayer = getAvatarLayer();
 			dragonLayer.setCell(movingCharacter.getX(), movingCharacter.getY(), cell);
 		}
@@ -315,7 +315,7 @@ public class MyGdxGame extends ApplicationAdapter implements ApplicationListener
 	}
 
 	private TiledMapTileLayer getAvatarLayer() {
-		List<TiledMapTileLayer> avatarLayers = getLayersByName("walking");
+		List<TiledMapTileLayer> avatarLayers = getLayersByName("avatar");
 		return avatarLayers.get(0);
 	}
 
