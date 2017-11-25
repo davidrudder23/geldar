@@ -53,6 +53,14 @@ public abstract class Item {
 
     public abstract float getNumFramesPerSecond();
 
+    /**
+     * Returns 0 for no chance, 1 for 100% chance, 0.5 for 50%
+     * @return
+     */
+    public float getRandomizationChange() {
+        return 0;
+    }
+
     public Item(GeldarGame parent, String spriteFilename, Point point) {
         this.parent = parent;
         this.point = point;
@@ -66,7 +74,9 @@ public abstract class Item {
         animationTask = Timer.schedule(new Timer.Task(){
                                            @Override
                                            public void run() {
-                                               frame++;
+                                               if (Math.random()>getRandomizationChange()) {
+                                                   frame++;
+                                               }
                                                frame %= animation.length;
                                            }
                                        }

@@ -12,6 +12,7 @@ import org.noses.game.character.Dragon;
 import org.noses.game.character.Mage;
 import org.noses.game.character.MovingCharacter;
 import org.noses.game.item.Egg;
+import org.noses.game.item.GoldStar;
 import org.noses.game.item.Item;
 import org.noses.game.item.Vent;
 import org.noses.game.path.MovingCollision;
@@ -138,10 +139,10 @@ public class GeldarGame extends ApplicationAdapter implements ApplicationListene
             items.add(vent);
         }
         for (int x = 0; x < 100; x++) {
-            Egg egg = new Egg(this, "egg.png");
-            Point point = egg.findGoodPlace(getObstructionLayers(), items);
-            egg.setPoint(point);
-            items.add(egg);
+            GoldStar goldStar = new GoldStar(this);
+            Point point = goldStar.findGoodPlace(getObstructionLayers(), items);
+            goldStar.setPoint(point);
+            items.add(goldStar);
         }
         avatar = new Avatar(this);
 

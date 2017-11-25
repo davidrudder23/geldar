@@ -140,8 +140,8 @@ public class Avatar extends MovingCharacter {
     @Override
     public void collideWith(Item item) {
         System.out.println("Cillinding with " + item);
-        if (item instanceof Egg) {
-            addToInventory((Egg) item);
+        if (item.isInventory()) {
+            addToInventory(item);
         }
     }
 
