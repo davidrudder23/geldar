@@ -3,10 +3,7 @@ package org.noses.game.ui.hud;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Cell;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 import org.noses.game.GeldarGame;
 import org.noses.game.item.Item;
@@ -80,10 +77,9 @@ public class HUD {
 		HashMap<String, List<Item>> sortedInventory = parent.getAvatar().getInventory().getSortedInventory();
 
 		for (String inventoryType: sortedInventory.keySet()) {
-			inventoryTable.add(new Label(inventoryType, new Skin(Gdx.files.internal("skin/rainbow-ui.json"))))
-					.pad(10)
-					.right();
-			inventoryTable.add(sortedInventory.get(inventoryType).get(0).getActor());
+			Image itemIcon = new Image(sortedInventory.get(inventoryType).get(0).getTextureRegion());
+			inventoryTable.add(itemIcon).pad(10).left();
+
 			inventoryTable.add(new Label(sortedInventory.get(inventoryType).size()+"", new Skin(Gdx.files.internal("skin/rainbow-ui.json"))))
 					.pad(10)
 					.left();

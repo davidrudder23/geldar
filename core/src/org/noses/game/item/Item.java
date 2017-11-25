@@ -85,10 +85,8 @@ public abstract class Item {
 
     }
 
-    public Actor getActor() {
-        TiledMapTileLayer.Cell cell = new TiledMapTileLayer.Cell();
-        cell.setTile(new StaticTiledMapTile(animation[frame]));
-        return cell;
+    public TextureRegion getTextureRegion() {
+        return animation[frame];
     }
 
     public boolean overlaps(Item item) {
