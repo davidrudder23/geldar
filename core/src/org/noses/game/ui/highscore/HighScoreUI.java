@@ -46,7 +46,7 @@ public class HighScoreUI {
 					if ((input.getText() == null) || (input.getText().equals(""))) {
 						return;
 					}
-					HighScoreRepository.getInstance().saveScore(input.getText(), parent.getAvatar().getScore());
+					HighScoreRepository.getInstance(parent.getMongoPassword()).saveScore(input.getText(), parent.getAvatar().getScore());
 					stage = new Stage();
 					Gdx.input.setInputProcessor(parent);
 

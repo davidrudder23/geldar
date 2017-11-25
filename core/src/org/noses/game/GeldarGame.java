@@ -123,7 +123,10 @@ public class GeldarGame extends ApplicationAdapter implements ApplicationListene
         yellow.setTile(new StaticTiledMapTile(new TextureRegion(new Texture("yellow.png"))));
         highlights.put("yellow", yellow);
 
-        HighScoreRepository.getInstance(getMongoPassword());
+        // Connect to Mongo in the background
+        new Thread(() -> {
+            HighScoreRepository.getInstance(getMongoPassword());
+        }).start();
 
         startGame();
     }

@@ -29,15 +29,6 @@ public class HighScoreRepository {
 		mongoDatabase = mongoClient.getDatabase("high_scores");
 	}
 
-	/**
-	 * Only use this if you've already called getInstance w/ the password
-	 * 
-	 * @return
-	 */
-	public static HighScoreRepository getInstance() {
-		return instance;
-	}
-
 	public static HighScoreRepository getInstance(String mongoPassword) {
 		if (instance == null) {
 			instance = new HighScoreRepository(mongoPassword);

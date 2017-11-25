@@ -68,7 +68,7 @@ public class HighScoreListUI {
 			}
 		});
 
-		List<HighScore> highScores = HighScoreRepository.getInstance().getHighScores();
+		List<HighScore> highScores = HighScoreRepository.getInstance(parent.getMongoPassword()).getHighScores();
 
 		highScores.stream().forEach(hs -> {
 			Label name = new Label(hs.getName(), skin);
