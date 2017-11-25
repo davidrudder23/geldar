@@ -26,6 +26,7 @@ public class Avatar extends MovingCharacter {
     private int score;
 
     Sound captureSound;
+    Sound pickupSound;
     Sound walkSound;
     Sound hurtSound;
 
@@ -34,7 +35,8 @@ public class Avatar extends MovingCharacter {
     public Avatar(GeldarGame parent) {
         super("avatar.png", parent);
 
-        captureSound = Gdx.audio.newSound(Gdx.files.internal("sounds/inventory/coin.wav"));
+        captureSound = Gdx.audio.newSound(Gdx.files.internal("sounds/capture.wav"));
+        pickupSound = Gdx.audio.newSound(Gdx.files.internal("sounds/pickup.wav"));
         hurtSound = Gdx.audio.newSound(Gdx.files.internal("sounds/hurt.wav"));
         walkSound = Gdx.audio.newSound(Gdx.files.internal("sounds/walk.wav"));
 
@@ -139,7 +141,6 @@ public class Avatar extends MovingCharacter {
 
     @Override
     public void collideWith(Item item) {
-        System.out.println("Cillinding with " + item);
         if (item.isInventory()) {
             addToInventory(item);
         }
@@ -175,6 +176,7 @@ public class Avatar extends MovingCharacter {
 
         if (!inventory.contains(item)) {
             System.out.println("Adding " + item + " to inventory");
+            pickupSound.play();
             inventory.add(item);
         }
         parent.removeItem(item);
