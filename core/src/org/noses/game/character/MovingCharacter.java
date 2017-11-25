@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.noses.game.GeldarGame;
+import org.noses.game.item.Item;
 import org.noses.game.path.Frontier;
 import org.noses.game.path.MovingCollision;
 import org.noses.game.path.PathStep;
@@ -19,9 +21,8 @@ public abstract class MovingCharacter extends Character {
 	private int pathStep;
 	private Task movingTask;
 
-	protected MovingCharacter(String spriteFilename, List<TiledMapTileLayer> obstructionLayers,
-			TiledMapTileLayer avatarLayer) {
-		super(spriteFilename, obstructionLayers, avatarLayer);
+	protected MovingCharacter(String spriteFilename, GeldarGame parent) {
+		super(spriteFilename, parent);
 
 		Point startingPoint = findAGoodSpot();
 		x = startingPoint.getX();
@@ -53,8 +54,8 @@ public abstract class MovingCharacter extends Character {
 		Point point = null;
 
 		do {
-			int x = (int) (Math.random() * avatarLayer.getWidth());
-			int y = (int) (Math.random() * avatarLayer.getHeight());
+			int x = (int) (Math.random() * parent.getAvatarLayer().getWidth());
+			int y = (int) (Math.random() * parent.getAvatarLayer().getHeight());
 
 			point = new Point(x, y);
 		} while (isMovementBlocked(point));
@@ -98,6 +99,8 @@ public abstract class MovingCharacter extends Character {
 	}
 
 	public abstract void collideWith(MovingCharacter collider);
+
+	public abstract void collideWith(Item item);
 
 	/**
 	 * Finds the best path from from to to using a simplified djikstra's algo

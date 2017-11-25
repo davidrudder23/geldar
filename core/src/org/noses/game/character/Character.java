@@ -1,8 +1,8 @@
 package org.noses.game.character;
 
 
-import java.util.List;
-
+import org.noses.game.GeldarGame;
+import org.noses.game.item.Item;
 import org.noses.game.path.MovingCollision;
 import org.noses.game.path.Point;
 
@@ -20,20 +20,20 @@ public abstract class Character {
     int frame;
 
     TextureRegion[][] animation;
-	List<TiledMapTileLayer> obstructionLayers;
-	TiledMapTileLayer avatarLayer;
 
-    protected Character(String spriteFilename, List<TiledMapTileLayer> obstructionLayers, TiledMapTileLayer avatarLayer) {
-    	this.obstructionLayers = obstructionLayers;
-    	this.avatarLayer = avatarLayer;
-    	
+    GeldarGame parent;
+
+    protected Character(String spriteFilename, GeldarGame parent) {
+
+    	this.parent = parent;
+
         x = 0;
         y = 0;
         direction = 0;
         frame = 0;
 
         Texture avatarAnimationSheet = new Texture(spriteFilename);
-        animation = TextureRegion.split(avatarAnimationSheet, (int)avatarLayer.getTileWidth(), (int)avatarLayer.getTileHeight());
+        animation = TextureRegion.split(avatarAnimationSheet, (int)parent.getAvatarLayer().getTileWidth(), (int)parent.getAvatarLayer().getTileHeight());
 
         Timer.schedule(new Timer.Task(){
                            @Override
@@ -126,12 +126,24 @@ public abstract class Character {
 	public boolean isMovementBlocked(Point point) {
 		//System.out.println(point+"  isOffscreen="+isOffScreen(point)+" isCollision="+isCollision(point));
 		if (isOffScreen(point)) return true;
-		if (isCollision(point)) return true;
+        if (isCollision(point)) return true;
+        if (isOccupiedByItem(point)) return true;
 		return false;
 	}
-	
+
+	private boolean isOccupiedByItem(Point point) {
+        for (Item item: parent.getItems()) {
+            if (item.isObstruction()) {
+                if (item.occupies(point)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 	private boolean isCollision(Point point) {
-		for (TiledMapTileLayer ml: obstructionLayers) {
+		for (TiledMapTileLayer ml: parent.getObstructionLayers()) {
 			if (ml.getCell(point.getX(), point.getY()) != null) {
 				return true;
 			}
@@ -142,9 +154,9 @@ public abstract class Character {
 	protected boolean isOffScreen(Point point) {
 		//System.out.println("isOffScreen "+point+".  width="+avatarLayer.getWidth()+" height="+avatarLayer.getHeight());
 		if (point.getX() < 0) return true;
-		if (point.getX() >= avatarLayer.getWidth()) return true;
+		if (point.getX() >= parent.getAvatarLayer().getWidth()) return true;
 		if (point.getY() < 0) return true;
-		if (point.getY() >= avatarLayer.getHeight()) return true;
+		if (point.getY() >= parent.getAvatarLayer().getHeight()) return true;
 
 		return false;
 	}

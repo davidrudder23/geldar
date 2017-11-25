@@ -1,14 +1,14 @@
 package org.noses.game.ui;
 
-import org.noses.game.MyGdxGame;
+import org.noses.game.GeldarGame;
 import org.noses.game.ui.hud.HUD;
 
 public class UI {
-	MyGdxGame parent;
+	GeldarGame parent;
 
 	HUD hud;
 
-	public UI(MyGdxGame parent) {
+	public UI(GeldarGame parent) {
 		this.parent = parent;
 	}
 
