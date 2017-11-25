@@ -30,6 +30,7 @@ public class Inventory {
     public HashMap<String, List<Item>> getSortedInventory() {
         HashMap<String, List<Item>> sortedInventory = new HashMap<>();
 
+
         for (Item item: itemsInInventory) {
             List<Item> itemsOfThisType = sortedInventory.get(item.getItemName());
             if (itemsOfThisType == null) {

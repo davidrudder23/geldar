@@ -1,9 +1,12 @@
 package org.noses.game.ui.hud;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import org.noses.game.GeldarGame;
 import org.noses.game.item.Item;
@@ -31,6 +34,8 @@ public class HUD {
 
 	private static HUD instance;
 
+	Skin skin;
+
 	private HUD (GeldarGame parent) {
 
 		this.parent = parent;
@@ -44,15 +49,19 @@ public class HUD {
 		
 		debug = false;
 
+		skin = new Skin(Gdx.files.internal("skin/rainbow-ui.json"));
+
 		// Add widgets to the table here.
-		scoreLabel = new Label("1", new Skin(Gdx.files.internal("skin/rainbow-ui.json")));
+		scoreLabel = new Label("1", skin);
 		table.add(scoreLabel).pad(10).fillX().align(Align.left);
 
-		timeLabel = new Label("60", new Skin(Gdx.files.internal("skin/rainbow-ui.json")));
+		timeLabel = new Label("60", skin);
 		table.add(timeLabel).pad(10).fillX().align(Align.right);
 
 		table.row();
 		inventoryTable = new Table();
+
+		//inventoryTable.setBackground(new TextureRegionDrawable(new TextureRegion(new Texture("fog.png"))));
 
 		table.add(inventoryTable).expand().pad(10).fillY().align(Align.left);
 		table.add().right();
@@ -80,7 +89,10 @@ public class HUD {
 			Image itemIcon = new Image(sortedInventory.get(inventoryType).get(0).getTextureRegion());
 			inventoryTable.add(itemIcon).pad(10).left();
 
-			inventoryTable.add(new Label(sortedInventory.get(inventoryType).size()+"", new Skin(Gdx.files.internal("skin/rainbow-ui.json"))))
+			Label label = new Label(sortedInventory.get(inventoryType).size()+"", skin);
+			label.setFontScale(2.0f);
+
+			inventoryTable.add(label)
 					.pad(10)
 					.left();
 			inventoryTable.row();
