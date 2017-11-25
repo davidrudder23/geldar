@@ -12,7 +12,7 @@ public class BronzeStar extends Item {
     Timer.Task eggTimer;
     GeldarGame parent;
 
-    public BronzeStar(GeldarGame parent, String spriteFilename) {
+    public BronzeStar(GeldarGame parent) {
         super(parent, "bronze_star.png", new Point());
 
     }

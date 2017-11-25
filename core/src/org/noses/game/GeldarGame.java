@@ -11,10 +11,7 @@ import org.noses.game.character.Avatar;
 import org.noses.game.character.Dragon;
 import org.noses.game.character.Mage;
 import org.noses.game.character.MovingCharacter;
-import org.noses.game.item.Egg;
-import org.noses.game.item.GoldStar;
-import org.noses.game.item.Item;
-import org.noses.game.item.Vent;
+import org.noses.game.item.*;
 import org.noses.game.path.MovingCollision;
 import org.noses.game.path.Point;
 import org.noses.game.ui.highscore.HighScoreListUI;
@@ -56,26 +53,26 @@ public class GeldarGame extends ApplicationAdapter implements ApplicationListene
     private int tilePixelWidth;
     private int tilePixelHeight;
 
-    TiledMapTileLayer avatarLayer;
+    private TiledMapTileLayer avatarLayer;
 
-    Avatar avatar;
-    List<MovingCharacter> movingCharacters;
-    List<Item> items;
+    private Avatar avatar;
+    private List<MovingCharacter> movingCharacters;
+    private List<Item> items;
 
-    Map<String, Cell> highlights;
+    private Map<String, Cell> highlights;
 
-    HUD hud;
-    HighScoreUI highScoreUI;
-    HighScoreListUI highScoreListUI;
+    private HUD hud;
+    private HighScoreUI highScoreUI;
+    private HighScoreListUI highScoreListUI;
 
-    int magnification;
+    private int magnification;
 
-    int timer;
+    private int timer;
 
-    Sound gameOverSound;
+    private Sound gameOverSound;
 
-    Timer.Task gameTimer;
-    Timer.Task keyPressTimer;
+    private Timer.Task gameTimer;
+    private Timer.Task keyPressTimer;
 
     private Properties properties;
 
@@ -97,7 +94,7 @@ public class GeldarGame extends ApplicationAdapter implements ApplicationListene
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
 
-        hud = HUD.getInstance();
+        hud = HUD.getInstance(this);
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, w, h);
@@ -124,28 +121,37 @@ public class GeldarGame extends ApplicationAdapter implements ApplicationListene
         highlights.put("yellow", yellow);
 
         // Connect to Mongo in the background
-        new Thread(() -> {
-            HighScoreRepository.getInstance(getMongoPassword());
-        }).start();
+        new Thread(() -> HighScoreRepository.getInstance(getMongoPassword())).start();
 
         startGame();
     }
 
-    public void startGame() {
+    private void startGame() {
 
         items = new ArrayList<>();
-        for (int x = 0; x < 100; x++) {
+        for (int x = 0; x < 20; x++) {
             Vent vent = new Vent(this);
             Point point = vent.findGoodPlace(getObstructionLayers(), items);
             vent.setX(point.getX());
             vent.setY(point.getY());
             items.add(vent);
         }
-        for (int x = 0; x < 100; x++) {
+        for (int x = 0; x < 30; x++) {
+            BronzeStar bronzeStar = new BronzeStar(this);
+            Point point = bronzeStar.findGoodPlace(getObstructionLayers(), items);
+            bronzeStar.setPoint(point);
+            items.add(bronzeStar);
+
+            SilverStar silverStar = new SilverStar(this);
+            point = silverStar.findGoodPlace(getObstructionLayers(), items);
+            silverStar.setPoint(point);
+            items.add(silverStar);
+
             GoldStar goldStar = new GoldStar(this);
-            Point point = goldStar.findGoodPlace(getObstructionLayers(), items);
+            point = goldStar.findGoodPlace(getObstructionLayers(), items);
             goldStar.setPoint(point);
             items.add(goldStar);
+
         }
         avatar = new Avatar(this);
 
@@ -172,7 +178,7 @@ public class GeldarGame extends ApplicationAdapter implements ApplicationListene
         startTimer();
     }
 
-    public void stopGame() {
+    private void stopGame() {
         avatar.disable();
         // gameOverSound.play();
 

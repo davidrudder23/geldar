@@ -1,19 +1,14 @@
 package org.noses.game.character;
 
-import java.util.List;
-
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.utils.Timer;
+import com.badlogic.gdx.utils.Timer.Task;
 import org.noses.game.GeldarGame;
 import org.noses.game.character.inventory.Inventory;
-import org.noses.game.item.Egg;
 import org.noses.game.item.Item;
 import org.noses.game.path.MovingCollision;
 import org.noses.game.ui.hud.HUD;
-
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.utils.Timer;
-import com.badlogic.gdx.utils.Timer.Task;
 
 public class Avatar extends MovingCharacter {
 
@@ -81,7 +76,7 @@ public class Avatar extends MovingCharacter {
         MovingCollision.getInstance().getMovingCharacters().remove(collider);
         score++;
 
-        HUD.getInstance().setScore(score);
+        HUD.getInstance(parent).setScore(score);
 
         captureSound.play();
 
@@ -120,7 +115,7 @@ public class Avatar extends MovingCharacter {
             }
         }, 2);
 
-        HUD.getInstance().setScore(score);
+        HUD.getInstance(parent).setScore(score);
 
         hurtSound.play();
     }
@@ -180,6 +175,10 @@ public class Avatar extends MovingCharacter {
             inventory.add(item);
         }
         parent.removeItem(item);
+    }
+
+    public Inventory getInventory() {
+        return inventory;
     }
 
 }

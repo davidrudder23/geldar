@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Timer;
 import org.noses.game.GeldarGame;
 import org.noses.game.path.Point;
@@ -82,6 +83,12 @@ public abstract class Item {
                                        }
                 ,0f,1/getNumFramesPerSecond());
 
+    }
+
+    public Actor getActor() {
+        TiledMapTileLayer.Cell cell = new TiledMapTileLayer.Cell();
+        cell.setTile(new StaticTiledMapTile(animation[frame]));
+        return cell;
     }
 
     public boolean overlaps(Item item) {
