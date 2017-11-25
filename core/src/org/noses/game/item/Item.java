@@ -1,17 +1,25 @@
 package org.noses.game.item;
 
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.utils.Timer;
+import org.noses.game.GeldarGame;
 import org.noses.game.path.Point;
 
 import java.util.List;
 
 public abstract class Item {
 
-    Tile[][] tiles;
+    TextureRegion[] animation;
+
+    int frame;
 
     // This is the item's origin on the map, in tiles
     Point point;
+
+    GeldarGame parent;
 
     public abstract String getItemName();
 
@@ -43,35 +51,35 @@ public abstract class Item {
         this.point = point;
     }
 
+    public abstract float getNumFramesPerSecond();
+
+    public Item(GeldarGame parent, String spriteFilename, Point point) {
+        this.parent = parent;
+        this.point = point;
+
+        Texture avatarAnimationSheet = new Texture(spriteFilename);
+        TextureRegion[][] regions = TextureRegion.split(avatarAnimationSheet, (int) parent.getAvatarLayer().getTileWidth(), (int) parent.getAvatarLayer().getTileWidth());
+        animation = regions[0];
+
+        frame = 0;
+
+        animationTask = Timer.schedule(new Timer.Task(){
+                                           @Override
+                                           public void run() {
+                                               frame++;
+                                               frame %= animation.length;
+                                           }
+                                       }
+                ,0f,1/getNumFramesPerSecond());
+
+    }
+
     public boolean overlaps(Item item) {
-        for (int x = 0; x < tiles.length; x++) {
-            for (int y = 0; y < tiles[x].length; y++) {
-                if (item.occupies(new Point(x,y))) {
-                    return true;
-                }
-            }
-        }
-        return false;
+       return item.point.equals(point);
     }
 
     public boolean occupies(Point point) {
-        if (getX() > point.getX()) {
-            return false;
-        }
-
-        if (getY() > point.getY()) {
-            return false;
-        }
-
-        if (point.getX() > (getX()+tiles.length)) {
-            return false;
-        }
-
-        if (point.getY() > (getY()+tiles[0].length)) {
-            return false;
-        }
-
-        return true;
+        return point.equals(this.point);
     }
 
     public Point findGoodPlace(List<TiledMapTileLayer> obstructionLayers, List<Item> items) {
@@ -105,54 +113,19 @@ public abstract class Item {
     }
 
 
-    public void startAnimation() {
-        animationTask = Timer.schedule(new Timer.Task(){
-                           @Override
-                           public void run() {
-                               for (int x = 0; x < tiles.length; x++) {
-                                   for (int y = 0; y < tiles[x].length; y++) {
-                                       if (tiles[x][y] != null) {
-                                           tiles[x][y].nextFrame();
-                                       }
-                                   }
-                               }
-                           }
-                       }
-                ,0f,1/10.0f);
-    }
-
     public void render(TiledMapTileLayer layer) {
-        /*if (!canRender(layer)) {
-            System.out.println("Can't render "+this);
-            return;
-        }*/
-        for (int x = 0; x < tiles.length; x++) {
-            for (int y = 0; y < tiles[x].length; y++) {
-                Tile tile  = tiles[x][y];
-                if (tile != null) {
-                    tile.render(point, layer);
-                }
-            }
-        }
+        TiledMapTileLayer.Cell cell = new TiledMapTileLayer.Cell();
+
+        cell.setTile(new StaticTiledMapTile(animation[frame]));
+        layer.setCell(point.getX(), point.getY(), cell);
     }
 
     public boolean canRender(TiledMapTileLayer layer) {
-        for (int x = 0; x < tiles.length; x++) {
-            for (int y = 0; y < tiles[x].length; y++) {
-                Tile tile  = tiles[x][y];
-                if (tile != null) {
-                    if (!tile.canRender(layer)) {
-                        return false;
-                    }
-                }
-            }
-        }
-
-        return true;
+        return (layer.getCell(point.getX(), point.getY()) == null);
     }
 
     public String toString() {
-        return tiles.length+"x"+tiles[0].length+" "+getItemName();
+        return "Item("+getItemName()+")";
     }
 
     public boolean touchDown(int button) {

@@ -233,20 +233,25 @@ public class GeldarGame extends ApplicationAdapter implements ApplicationListene
 
     }
 
-    @Override
-    public void render() {
-        for (int x = 0; x < getAvatarLayer().getWidth(); x++) {
-            for (int y = 0; y < getAvatarLayer().getHeight(); y++) {
-                getAvatarLayer().setCell(x, y, null);
-                getUILayer().setCell(x, y, null);
+    private void clearLayer(TiledMapTileLayer layer) {
+        for (int x = 0; x < layer.getWidth(); x++) {
+            for (int y = 0; y < layer.getHeight(); y++) {
+                layer.setCell(x, y, null);
             }
         }
+    }
+
+    @Override
+    public void render() {
+        clearLayer(getAvatarLayer());
+        clearLayer(getUILayer());
+
         Gdx.gl.glClearColor(1, 0, 0, 1);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         if (items != null) {
-            for (Item item : items) {
+            for (Item item: items) {
                 item.render(getUILayer());
             }
         }
@@ -444,11 +449,7 @@ public class GeldarGame extends ApplicationAdapter implements ApplicationListene
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
-        for (int x = 0; x < 100; x++) {
-            for (int y = 0; y < 100; y++) {
-                getHighlightLayer().setCell(x, y, null);
-            }
-        }
+        clearLayer(getHighlightLayer());
 
         getHighlightLayer().setCell(getTileXFromScreenX(screenX), getTileYFromScreenY(screenY), highlights.get("red"));
         // TODO Auto-generated method stub

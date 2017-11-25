@@ -17,37 +17,8 @@ public class Egg extends Item {
     GeldarGame parent;
 
     public Egg(GeldarGame parent, String spriteFilename) {
-        this.parent = parent;
+        super(parent, "egg.png", new Point());
 
-        Texture avatarAnimationSheet = new Texture(spriteFilename);
-        TextureRegion[][] regions = TextureRegion.split(avatarAnimationSheet, (int) parent.getAvatarLayer().getTileWidth(), (int) parent.getAvatarLayer().getTileWidth());
-
-        if (regions.length <= 0) {
-            System.out.println("Error: item pixmap must be at least 1 tile large");
-        }
-        tiles = new Tile[regions.length][regions[0].length];
-        for (int x = 0; x < regions.length; x++) {
-            for (int y = 0; y < regions[x].length; y++) {
-                TextureRegion[] region = new TextureRegion[1];
-                region[0] = regions[x][y];
-                Tile tile = new Tile(new Point(y, 2 - x), region);
-                tiles[x][y] = tile;
-            }
-        }
-
-        /*eggTimer = Timer.instance().scheduleTask(new Timer.Task() {
-
-            @Override
-            public void run() {
-                nextState();
-                if (state == HATCHED) {
-                    eggTimer.cancel();
-                    parent.getAvatar().setScore(parent.getAvatar().getScore()+5);
-                }
-            }
-        }, 3, 5);*/
-
-        point = new Point(0,0);
     }
 
     public String getItemName() {
@@ -82,6 +53,10 @@ public class Egg extends Item {
         System.out.println("Touch down on egg at "+point);
         //parent.getAvatar().addToInventory(this);
         return true;
+    }
+
+    public float getNumFramesPerSecond() {
+        return 5;
     }
 
 }
