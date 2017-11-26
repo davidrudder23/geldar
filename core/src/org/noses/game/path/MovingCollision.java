@@ -1,7 +1,6 @@
 package org.noses.game.path;
 
 import org.noses.game.character.Avatar;
-import org.noses.game.character.Dragon;
 import org.noses.game.character.MovingCharacter;
 import org.noses.game.item.Item;
 

@@ -153,9 +153,9 @@ public class Avatar extends MovingCharacter {
 
     @Override
     public void collideWith(MovingCharacter collider) {
-        if (collider instanceof Dragon) {
+        if (collider instanceof Orb) {
             captured(collider);
-        } else if (collider instanceof Mage) {
+        } else if (collider instanceof Enemy) {
             hurt();
         }
     }

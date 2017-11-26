@@ -10,19 +10,19 @@ import org.noses.game.path.Point;
 import java.util.HashMap;
 import java.util.List;
 
-public class Vent extends Item {
+public class DropPoint extends Item {
     private Timer.Task dropoffTask;
 
     private boolean canDropoff = true;
 
     private Sound dropoffSound;
 
-    public Vent(GeldarGame parent) {
+    public DropPoint(GeldarGame parent) {
         this(parent, new Point(0, 0));
     }
 
-    public Vent(GeldarGame parent, Point point) {
-        super(parent, "vent.png", point);
+    public DropPoint(GeldarGame parent, Point point) {
+        super(parent, "droppoint.png", point);
 
         canDropoff = true;
 
@@ -70,7 +70,7 @@ public class Vent extends Item {
 
     @Override
     public boolean touchUp(int button) {
-        System.out.println("Vent touch up");
+        System.out.println("DropPoint touch up");
         return super.touchUp(button);
     }
 

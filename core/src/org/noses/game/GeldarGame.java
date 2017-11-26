@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.noses.game.character.Avatar;
-import org.noses.game.character.Dragon;
-import org.noses.game.character.Mage;
+import org.noses.game.character.Enemy;
+import org.noses.game.character.Orb;
 import org.noses.game.character.MovingCharacter;
 import org.noses.game.item.*;
 import org.noses.game.path.MovingCollision;
@@ -130,11 +130,11 @@ public class GeldarGame extends ApplicationAdapter implements ApplicationListene
 
         items = new ArrayList<>();
         for (int x = 0; x < 20; x++) {
-            Vent vent = new Vent(this);
-            Point point = vent.findGoodPlace(getObstructionLayers(), items);
-            vent.setX(point.getX());
-            vent.setY(point.getY());
-            items.add(vent);
+            DropPoint dropPoint = new DropPoint(this);
+            Point point = dropPoint.findGoodPlace(getObstructionLayers(), items);
+            dropPoint.setX(point.getX());
+            dropPoint.setY(point.getY());
+            items.add(dropPoint);
         }
         for (int x = 0; x < 30; x++) {
             BronzeStar bronzeStar = new BronzeStar(this);
@@ -159,11 +159,11 @@ public class GeldarGame extends ApplicationAdapter implements ApplicationListene
 
         movingCharacters = new ArrayList<>();
         for (int i = 0; i < 50; i++) {
-            movingCharacters.add(new Dragon(this));
+            movingCharacters.add(new Orb(this));
         }
 
         for (int i = 0; i < 50; i++) {
-            movingCharacters.add(new Mage(avatar, this));
+            movingCharacters.add(new Enemy(avatar, this));
         }
 
         MovingCollision.getInstance().setAvatar(avatar);

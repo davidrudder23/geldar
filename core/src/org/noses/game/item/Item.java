@@ -102,13 +102,14 @@ public abstract class Item {
         boolean found = false;
         Point point = new Point();
 
+
         do {
             found = true;
             int randomX = (int) (Math.random() * obstructionLayers.get(0).getWidth());
             int randomY = (int) (Math.random() * obstructionLayers.get(0).getHeight());
 
             for (TiledMapTileLayer layer : obstructionLayers) {
-                if (!canRender(layer)) {
+                if (layer.getCell(randomX, randomY) != null) {
                     found = false;
                     continue;
                 }
@@ -135,10 +136,6 @@ public abstract class Item {
 
         cell.setTile(new StaticTiledMapTile(animation[frame]));
         layer.setCell(point.getX(), point.getY(), cell);
-    }
-
-    public boolean canRender(TiledMapTileLayer layer) {
-        return (layer.getCell(point.getX(), point.getY()) == null);
     }
 
     public String toString() {

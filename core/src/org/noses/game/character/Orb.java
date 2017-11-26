@@ -8,10 +8,10 @@ import org.noses.game.path.Point;
 
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 
-public class Dragon extends MovingCharacter {
+public class Orb extends MovingCharacter {
 
-	public Dragon(GeldarGame parent) {
-		super("dragon.png", parent);
+	public Orb(GeldarGame parent) {
+		super("orb.png", parent);
 
 		chooseNextSpot();
 	}

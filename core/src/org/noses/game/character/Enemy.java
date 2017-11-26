@@ -8,11 +8,11 @@ import org.noses.game.path.Point;
 
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 
-public class Mage extends MovingCharacter {
+public class Enemy extends MovingCharacter {
 
 	Avatar avatar;
 
-	public Mage(Avatar avatar, GeldarGame parent) {
+	public Enemy(Avatar avatar, GeldarGame parent) {
 		super("mage.png", parent);
 
 		this.avatar = avatar;
@@ -47,7 +47,7 @@ public class Mage extends MovingCharacter {
 
 	@Override
 	public void collideWith(MovingCharacter collider) {
-		System.out.println("Mage collided");
+		System.out.println("Enemy collided");
 	}
 
 	@Override
