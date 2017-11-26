@@ -57,4 +57,7 @@ public class Egg extends Item {
         return 5;
     }
 
+    public void avatarIsNear() {
+    }
+
 }

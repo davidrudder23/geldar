@@ -4,7 +4,7 @@ import com.badlogic.gdx.utils.Timer;
 import org.noses.game.GeldarGame;
 import org.noses.game.path.Point;
 
-public class SilverStar extends Item {
+public class SilverStar extends BaseStar {
     public static final int NEW = 0;
     public static final int CRACKED = 1;
     public static final int HATCHED = 2;

@@ -8,7 +8,11 @@ import org.noses.game.GeldarGame;
 import org.noses.game.character.inventory.Inventory;
 import org.noses.game.item.Item;
 import org.noses.game.path.MovingCollision;
+import org.noses.game.path.Point;
 import org.noses.game.ui.hud.HUD;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Avatar extends MovingCharacter {
 
@@ -57,6 +61,28 @@ public class Avatar extends MovingCharacter {
     protected void walk() {
         walkSound.play(0.5f);
         super.walk();
+    }
+
+    public List<Item> findNearbyItems( List<Item> items) {
+        return items.stream()
+                .filter(i -> {
+
+                    if (i.getX() < getX() - 1) {
+                        return false;
+                    }
+                    if (i.getX() > getX() + 1) {
+                        return false;
+                    }
+                    if (i.getY() < getY() - 1) {
+                        return false;
+                    }
+                    if (i.getY() > getY() + 1) {
+                        return false;
+                    }
+
+                    return true;
+                })
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -180,5 +206,42 @@ public class Avatar extends MovingCharacter {
     public Inventory getInventory() {
         return inventory;
     }
+
+    public void moveNorth() {
+        setDirection(3);
+        if (isMovementBlocked(new Point(getX(), getY()+1))) {
+            return;
+        }
+        MovingCollision.getInstance().handleCollision();
+        setY(getY()+1);
+    }
+
+    public void moveSouth() {
+        setDirection(0);
+        if (isMovementBlocked(new Point(getX(), getY()-1))) {
+            return;
+        }
+        MovingCollision.getInstance().handleCollision();
+        setY(getY()-1);
+    }
+
+    public void moveEast() {
+        setDirection(1);
+        if (isMovementBlocked(new Point(getX()+1, getY()))) {
+            return;
+        }
+        MovingCollision.getInstance().handleCollision();
+        setX(getX()+1);
+    }
+
+    public void moveWest() {
+        setDirection(2);
+        if (isMovementBlocked(new Point(getX()-1, getY()))) {
+            return;
+        }
+        MovingCollision.getInstance().handleCollision();
+        setX(getX()-1);
+    }
+
 
 }

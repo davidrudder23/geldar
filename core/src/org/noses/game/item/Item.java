@@ -56,6 +56,7 @@ public abstract class Item {
 
     /**
      * Returns 0 for no chance, 1 for 100% chance, 0.5 for 50%
+     *
      * @return
      */
     public float getRandomizationChange() {
@@ -72,16 +73,16 @@ public abstract class Item {
 
         frame = 0;
 
-        animationTask = Timer.schedule(new Timer.Task(){
+        animationTask = Timer.schedule(new Timer.Task() {
                                            @Override
                                            public void run() {
-                                               if (Math.random()>getRandomizationChange()) {
+                                               if (Math.random() > getRandomizationChange()) {
                                                    frame++;
                                                }
                                                frame %= animation.length;
                                            }
                                        }
-                ,0f,1/getNumFramesPerSecond());
+                , 0f, 1 / getNumFramesPerSecond());
 
     }
 
@@ -90,7 +91,7 @@ public abstract class Item {
     }
 
     public boolean overlaps(Item item) {
-       return item.point.equals(point);
+        return item.point.equals(point);
     }
 
     public boolean occupies(Point point) {
@@ -103,8 +104,8 @@ public abstract class Item {
 
         do {
             found = true;
-            int randomX = (int)(Math.random()*obstructionLayers.get(0).getWidth());
-            int randomY = (int)(Math.random()*obstructionLayers.get(0).getHeight());
+            int randomX = (int) (Math.random() * obstructionLayers.get(0).getWidth());
+            int randomY = (int) (Math.random() * obstructionLayers.get(0).getHeight());
 
             for (TiledMapTileLayer layer : obstructionLayers) {
                 if (!canRender(layer)) {
@@ -113,7 +114,7 @@ public abstract class Item {
                 }
             }
 
-            for (Item item: items) {
+            for (Item item : items) {
                 if (overlaps(item)) {
                     found = false;
                     continue;
@@ -127,6 +128,7 @@ public abstract class Item {
         return point;
     }
 
+    public abstract void avatarIsNear();
 
     public void render(TiledMapTileLayer layer) {
         TiledMapTileLayer.Cell cell = new TiledMapTileLayer.Cell();
@@ -140,16 +142,16 @@ public abstract class Item {
     }
 
     public String toString() {
-        return "Item("+getItemName()+")";
+        return "Item(" + getItemName() + ")";
     }
 
     public boolean touchDown(int button) {
-        System.out.println (this+" touch down");
+        System.out.println(this + " touch down");
         return true;
     }
 
     public boolean touchUp(int button) {
-        System.out.println (this+" touch up");
+        System.out.println(this + " touch up");
         return true;
     }
 

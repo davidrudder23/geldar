@@ -49,7 +49,47 @@ public class HUD {
 		
 		debug = false;
 
-		skin = new Skin(Gdx.files.internal("skin/rainbow-ui.json"));
+		/*
+		skin/arcade/skin/arcade-ui.json
+skin/biological-attack/skin/biological-attack-ui.json
+skin/clean-crispy/skin/clean-crispy-ui.json
+skin/cloud-form/skin/cloud-form-ui.json
+skin/comic/skin/comic-ui.json
+skin/commodore64/skin/uiskin.json
+skin/craftacular/skin/craftacular-ui.json
+skin/default/skin/uiskin.json
+skin/expee/skin/expee-ui.json
+skin/flat-earth/skin/flat-earth-ui.json
+skin/flat/skin/skin.json
+skin/freezing/skin/freezing-ui.json
+skin/gdx-holo/skin/uiskin.json
+skin/glassy/skin/glassy-ui.json
+skin/golden-spiral/skin/golden-ui-skin.json
+skin/kenney-pixel/skin/skin.json
+skin/level-plane/skin/level-plane-ui.json
+skin/lgdxs/skin/lgdxs-ui.json
+skin/lml/skin/skin.json
+skin/metal/skin/metal-ui.json
+skin/neon/skin/neon-ui.json
+skin/neutralizer/skin/neutralizer-ui.json
+skin/number-cruncher/skin/number-cruncher-ui.json
+skin/orange/skin/uiskin.json
+skin/pixthulhu/skin/pixthulhu-ui.json
+skin/plain-james/skin/plain-james-ui.json
+skin/quantum-horizon/skin/quantum-horizon-ui.json
+skin/rainbow/skin/rainbow-ui.json
+skin/rusty-robot/skin/rusty-robot-ui.json
+skin/sgx/skin/sgx-ui.json
+skin/shade/skin/uiskin.json
+skin/skin-composer/skin/skin-composer-ui.json
+skin/star-soldier/skin/star-soldier-ui.json
+skin/terra-mother/skin/terra-mother-ui.json
+skin/tracer/skin/tracer-ui.json
+skin/tubular/skin/tubular-ui.json
+skin/vhs/skin/vhs-ui.json
+		 */
+
+		skin = new Skin(Gdx.files.internal("skin/commodore64/skin/uiskin.json"));
 
 		// Add widgets to the table here.
 		scoreLabel = new Label("1", skin);

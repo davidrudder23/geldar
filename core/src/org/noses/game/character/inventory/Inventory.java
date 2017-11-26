@@ -23,6 +23,10 @@ public class Inventory {
         itemsInInventory.add(item);
     }
 
+    public boolean remove(Item item) {
+        return itemsInInventory.remove(item);
+    }
+
     public List<Item> getItemsInInventory() {
         return itemsInInventory;
     }

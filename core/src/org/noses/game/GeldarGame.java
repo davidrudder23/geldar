@@ -217,6 +217,9 @@ public class GeldarGame extends ApplicationAdapter implements ApplicationListene
                     avatar.moveSouth();
                 }
 
+                avatar.findNearbyItems(getItems()).stream().forEach(i->i.avatarIsNear());
+                HUD.getInstance(null).setScore(avatar.getScore());
+
             }
         }, 1, 1 / avatar.getNumPerSecond());
     }
