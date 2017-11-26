@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
+import com.badlogic.gdx.*;
 import org.noses.game.character.Avatar;
 import org.noses.game.character.Enemy;
 import org.noses.game.character.Orb;
@@ -19,11 +19,6 @@ import org.noses.game.ui.highscore.HighScoreRepository;
 import org.noses.game.ui.highscore.HighScoreUI;
 import org.noses.game.ui.hud.HUD;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.ApplicationListener;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -54,6 +49,9 @@ public class GeldarGame extends ApplicationAdapter implements ApplicationListene
     private int tilePixelHeight;
 
     private TiledMapTileLayer avatarLayer;
+    private TiledMapTileLayer uiLayer;
+    private TiledMapTileLayer highlightLayer;
+    private List<TiledMapTileLayer> obstructionLayers;
 
     private Avatar avatar;
     private List<MovingCharacter> movingCharacters;
@@ -74,18 +72,13 @@ public class GeldarGame extends ApplicationAdapter implements ApplicationListene
     private Timer.Task gameTimer;
     private Timer.Task keyPressTimer;
 
-    private Properties properties;
+    private Preferences prefs;
+
 
     @Override
     public void create() {
 
-        properties = new Properties();
-        try {
-            properties.load(Gdx.files.internal("game.properties").read());
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        prefs = Gdx.app.getPreferences("Geldar Game");
 
         magnification = 0;
 
@@ -155,7 +148,7 @@ public class GeldarGame extends ApplicationAdapter implements ApplicationListene
         }
 
         for (int x = 0; x < 10; x++) {
-            SpeedUp speedUp = new SpeedUp(this, new Point(0,0));
+            SpeedUp speedUp = new SpeedUp(this, new Point(0, 0));
             Point point = speedUp.findGoodPlace(getObstructionLayers(), items);
             speedUp.setPoint(point);
             items.add(speedUp);
@@ -203,7 +196,7 @@ public class GeldarGame extends ApplicationAdapter implements ApplicationListene
     }
 
     public void restartGame() {
-        System.exit(0);
+        Gdx.app.exit();
     }
 
     public void keyPressLoop() {
@@ -269,10 +262,6 @@ public class GeldarGame extends ApplicationAdapter implements ApplicationListene
     public void render() {
         clearLayer(getAvatarLayer());
         clearLayer(getUILayer());
-
-        Gdx.gl.glClearColor(1, 0, 0, 1);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         if (items != null) {
             for (Item item : items) {
@@ -363,15 +352,24 @@ public class GeldarGame extends ApplicationAdapter implements ApplicationListene
     }
 
     public List<TiledMapTileLayer> getObstructionLayers() {
-        return getLayersByName("obstruction");
+        if (obstructionLayers == null) {
+            obstructionLayers = getLayersByName("obstruction");
+        }
+        return obstructionLayers;
     }
 
     public TiledMapTileLayer getHighlightLayer() {
-        return getLayersByName("highlight").get(0);
+        if (highlightLayer == null) {
+            highlightLayer = getLayersByName("highlight").get(0);
+        }
+        return highlightLayer;
     }
 
     public TiledMapTileLayer getUILayer() {
-        return getLayersByName("ui").get(0);
+        if (uiLayer == null) {
+            uiLayer = getLayersByName("ui").get(0);
+        }
+        return uiLayer;
     }
 
     public TiledMapTileLayer getAvatarLayer() {
@@ -391,18 +389,18 @@ public class GeldarGame extends ApplicationAdapter implements ApplicationListene
     }
 
     private List<TiledMapTileLayer> getLayersByName(String name) {
-        List<TiledMapTileLayer> obstructionLayers = new ArrayList<>();
+        List<TiledMapTileLayer> layers = new ArrayList<>();
         MapLayers mapLayers = tiledMap.getLayers();
         for (int i = 0; i < mapLayers.getCount(); i++) {
             MapLayer mapLayer = mapLayers.get(i);
             if ((mapLayer.getName().toLowerCase().contains(name.toLowerCase()))
                     && (mapLayer instanceof TiledMapTileLayer)) {
                 TiledMapTileLayer tmtl = (TiledMapTileLayer) mapLayer;
-                obstructionLayers.add(tmtl);
+                layers.add(tmtl);
             }
         }
 
-        return obstructionLayers;
+        return layers;
     }
 
     @Override
@@ -596,7 +594,7 @@ public class GeldarGame extends ApplicationAdapter implements ApplicationListene
     }
 
     public String getProperty(String name) {
-        return properties.getProperty(name);
+        return prefs.getString(name);
     }
 
     public String getMongoPassword() {
