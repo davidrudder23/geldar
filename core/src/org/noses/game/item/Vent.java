@@ -85,12 +85,10 @@ public class Vent extends Item {
         Inventory inventory = parent.getAvatar().getInventory();
         HashMap<String, List<Item>> sortedItems = inventory.getSortedInventory();
 
-        System.out.println("item types=" + sortedItems.keySet());
 
         List<Item> bronzeStars = sortedItems.get("bronze star");
         if ((bronzeStars != null) && bronzeStars.size() > 0) {
             if (inventory.remove(bronzeStars.get(0))) {
-                System.out.println("Setting score to " + (parent.getAvatar().getScore() + 1));
                 parent.getAvatar().setScore(parent.getAvatar().getScore() + 1);
                 pauseDropoff();
                 return;
