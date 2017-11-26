@@ -32,7 +32,7 @@ public class Avatar extends MovingCharacter {
     Inventory inventory;
 
     public Avatar(GeldarGame parent) {
-        super("avatar.png", parent);
+        super("avatar.png", parent, 7);
 
         captureSound = Gdx.audio.newSound(Gdx.files.internal("sounds/capture.wav"));
         pickupSound = Gdx.audio.newSound(Gdx.files.internal("sounds/pickup.wav"));
@@ -85,10 +85,6 @@ public class Avatar extends MovingCharacter {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public float getNumPerSecond() {
-        return 7;
-    }
 
     public boolean canCapture() {
         return canCapture;
@@ -162,9 +158,7 @@ public class Avatar extends MovingCharacter {
 
     @Override
     public void collideWith(Item item) {
-        if (item.isInventory()) {
-            addToInventory(item);
-        }
+        item.collideWith(this);
     }
 
 

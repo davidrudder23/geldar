@@ -11,7 +11,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 public class Orb extends MovingCharacter {
 
 	public Orb(GeldarGame parent) {
-		super("orb.png", parent);
+		super("orb.png", parent, 5);
 
 		chooseNextSpot();
 	}
@@ -27,11 +27,6 @@ public class Orb extends MovingCharacter {
 		} while (isMovementBlocked(point));
 
 		moveTo(point);
-	}
-
-	@Override
-	protected float getNumPerSecond() {
-		return 5;
 	}
 
 	@Override

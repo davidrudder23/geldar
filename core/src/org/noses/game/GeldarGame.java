@@ -153,6 +153,14 @@ public class GeldarGame extends ApplicationAdapter implements ApplicationListene
             items.add(goldStar);
 
         }
+
+        for (int x = 0; x < 10; x++) {
+            SpeedUp speedUp = new SpeedUp(this, new Point(0,0));
+            Point point = speedUp.findGoodPlace(getObstructionLayers(), items);
+            speedUp.setPoint(point);
+            items.add(speedUp);
+        }
+
         avatar = new Avatar(this);
 
         avatar.initialize();
@@ -198,7 +206,10 @@ public class GeldarGame extends ApplicationAdapter implements ApplicationListene
         System.exit(0);
     }
 
-    private void keyPressLoop() {
+    public void keyPressLoop() {
+        if (keyPressTimer != null) {
+            keyPressTimer.cancel();
+        }
         keyPressTimer = Timer.schedule(new Timer.Task() {
 
             @Override
@@ -217,11 +228,11 @@ public class GeldarGame extends ApplicationAdapter implements ApplicationListene
                     avatar.moveSouth();
                 }
 
-                avatar.findNearbyItems(getItems()).stream().forEach(i->i.avatarIsNear());
+                avatar.findNearbyItems(getItems()).stream().forEach(i -> i.avatarIsNear());
                 HUD.getInstance(null).setScore(avatar.getScore());
 
             }
-        }, 1, 1 / avatar.getNumPerSecond());
+        }, 0, 1 / avatar.getNumPerSecond());
     }
 
     private void startTimer() {
@@ -264,7 +275,7 @@ public class GeldarGame extends ApplicationAdapter implements ApplicationListene
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         if (items != null) {
-            for (Item item: items) {
+            for (Item item : items) {
                 item.render(getUILayer());
             }
         }

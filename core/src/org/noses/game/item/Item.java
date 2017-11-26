@@ -7,6 +7,7 @@ import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Timer;
 import org.noses.game.GeldarGame;
+import org.noses.game.character.Avatar;
 import org.noses.game.path.Point;
 
 import java.util.List;
@@ -127,6 +128,12 @@ public abstract class Item {
         } while (!found);
 
         return point;
+    }
+
+    public void collideWith(Avatar avatar) {
+        if (isInventory()) {
+            avatar.addToInventory(this);
+        }
     }
 
     public abstract void avatarIsNear();

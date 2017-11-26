@@ -17,160 +17,171 @@ import com.badlogic.gdx.utils.Timer.Task;
 
 public abstract class MovingCharacter extends Character {
 
-	private List<Point> path;
-	private int pathStep;
-	private Task movingTask;
+    private List<Point> path;
+    private int pathStep;
+    private Task movingTask;
 
-	protected MovingCharacter(String spriteFilename, GeldarGame parent) {
-		super(spriteFilename, parent);
+    private float numPerSecond;
 
-		Point startingPoint = findAGoodSpot();
-		x = startingPoint.getX();
-		y = startingPoint.getY();
-	}
+    protected MovingCharacter(String spriteFilename, GeldarGame parent, float numPerSecond) {
+        super(spriteFilename, parent);
 
-	protected abstract float getNumPerSecond();
+        Point startingPoint = findAGoodSpot();
+        x = startingPoint.getX();
+        y = startingPoint.getY();
 
-	public void moveTo(Point point) {
-		stopWalking();
+        this.numPerSecond = numPerSecond;
+    }
 
-		path = getPath(point);
-		pathStep = 0;
+    public float getNumPerSecond() {
+        return numPerSecond;
+    }
 
-		movingTask = Timer.schedule(new Timer.Task() {
+    public void setNumPerSecond(float numPerSecond) {
+        this.numPerSecond = numPerSecond;
+        parent.keyPressLoop();
+    }
 
-			@Override
-			public void run() {
-				walk();
-			}
-		}, 0f, 1 / getNumPerSecond());
-	}
+    public void moveTo(Point point) {
+        stopWalking();
 
-	public void stop() {
-		stopWalking();
-	}
+        path = getPath(point);
+        pathStep = 0;
 
-	protected Point findAGoodSpot() {
-		Point point = null;
+        movingTask = Timer.schedule(new Timer.Task() {
 
-		do {
-			int x = (int) (Math.random() * parent.getAvatarLayer().getWidth());
-			int y = (int) (Math.random() * parent.getAvatarLayer().getHeight());
+            @Override
+            public void run() {
+                walk();
+            }
+        }, 0f, 1 / getNumPerSecond());
+    }
 
-			point = new Point(x, y);
-		} while (isMovementBlocked(point));
+    public void stop() {
+        stopWalking();
+    }
 
-		return point;
-	}
+    protected Point findAGoodSpot() {
+        Point point = null;
 
-	public abstract void chooseNextSpot();
+        do {
+            int x = (int) (Math.random() * parent.getAvatarLayer().getWidth());
+            int y = (int) (Math.random() * parent.getAvatarLayer().getHeight());
 
-	protected void walk() {
-		if (path == null) {
-			return;
-		}
-		Point nextPoint = path.get(pathStep);
-		// System.out.println("Next point="+nextPoint);
-		if (isMovementBlocked(nextPoint)) {
-			System.out.println("Can't move because blocked");
-			return;
-		}
+            point = new Point(x, y);
+        } while (isMovementBlocked(point));
 
-		x = nextPoint.getX();
-		y = nextPoint.getY();
+        return point;
+    }
 
-		pathStep++;
+    public abstract void chooseNextSpot();
 
-		if (pathStep >= path.size()) {
-			stopWalking();
-			chooseNextSpot();
-		}
+    protected void walk() {
+        if (path == null) {
+            return;
+        }
+        Point nextPoint = path.get(pathStep);
+        // System.out.println("Next point="+nextPoint);
+        if (isMovementBlocked(nextPoint)) {
+            System.out.println("Can't move because blocked");
+            return;
+        }
 
-		MovingCollision.getInstance().handleCollision();
+        x = nextPoint.getX();
+        y = nextPoint.getY();
 
-	}
+        pathStep++;
 
-	protected void stopWalking() {
-		path = null;
-		pathStep = 0;
-		if ((movingTask != null) && (movingTask.isScheduled())) {
-			movingTask.cancel();
-		}
-	}
+        if (pathStep >= path.size()) {
+            stopWalking();
+            chooseNextSpot();
+        }
 
-	public abstract void collideWith(MovingCharacter collider);
+        MovingCollision.getInstance().handleCollision();
 
-	public abstract void collideWith(Item item);
+    }
 
-	/**
-	 * Finds the best path from from to to using a simplified djikstra's algo
-	 * 
-	 * @param from
-	 * @param to
-	 * @return
-	 */
-	public List<Point> getPath(Point from, Point to) {
-		// long start = System.currentTimeMillis();
-		if (isMovementBlocked(to)) {
-			System.out.println("Movement is blocked");
-			return null;
-		}
+    protected void stopWalking() {
+        path = null;
+        pathStep = 0;
+        if ((movingTask != null) && (movingTask.isScheduled())) {
+            movingTask.cancel();
+        }
+    }
 
-		if (from.equals(to)) {
-			return Collections.singletonList(from);
-		}
+    public abstract void collideWith(MovingCharacter collider);
 
-		Frontier frontier = new Frontier(from);
+    public abstract void collideWith(Item item);
 
-		frontier.add(new PathStep(to, null));
+    /**
+     * Finds the best path from from to to using a simplified djikstra's algo
+     *
+     * @param from
+     * @param to
+     * @return
+     */
+    public List<Point> getPath(Point from, Point to) {
+        // long start = System.currentTimeMillis();
+        if (isMovementBlocked(to)) {
+            System.out.println("Movement is blocked");
+            return null;
+        }
 
-		Point current = to;
+        if (from.equals(to)) {
+            return Collections.singletonList(from);
+        }
 
-		while (!from.equals(current)) {
+        Frontier frontier = new Frontier(from);
 
-			List<Point> neighbors = new ArrayList<>();
-			neighbors.add(new Point(current.getX(), current.getY() - 1));
-			neighbors.add(new Point(current.getX(), current.getY() + 1));
-			neighbors.add(new Point(current.getX() - 1, current.getY()));
-			neighbors.add(new Point(current.getX() + 1, current.getY()));
+        frontier.add(new PathStep(to, null));
+
+        Point current = to;
+
+        while (!from.equals(current)) {
+
+            List<Point> neighbors = new ArrayList<>();
+            neighbors.add(new Point(current.getX(), current.getY() - 1));
+            neighbors.add(new Point(current.getX(), current.getY() + 1));
+            neighbors.add(new Point(current.getX() - 1, current.getY()));
+            neighbors.add(new Point(current.getX() + 1, current.getY()));
 
 			/*
-			 * neighbors.add(new Point(current.getX() - 1, current.getY() - 1));
+             * neighbors.add(new Point(current.getX() - 1, current.getY() - 1));
 			 * neighbors.add(new Point(current.getX() + 1, current.getY() - 1));
 			 * neighbors.add(new Point(current.getX() - 1, current.getY() - 1));
 			 * neighbors.add(new Point(current.getX() - 1, current.getY() + 1));
 			 */
 
-			final Point finalCurrent = current;
+            final Point finalCurrent = current;
 
-			neighbors.stream().filter(point -> !isMovementBlocked(point))
-					.map(point -> new PathStep(point, finalCurrent)).forEach(pathStep -> frontier.add(pathStep));
+            neighbors.stream().filter(point -> !isMovementBlocked(point))
+                    .map(point -> new PathStep(point, finalCurrent)).forEach(pathStep -> frontier.add(pathStep));
 
-			current = frontier.nextPoint();
+            current = frontier.nextPoint();
 
-			// System.out.println("from ="+from);
-			// System.out.println("current="+current);
+            // System.out.println("from ="+from);
+            // System.out.println("current="+current);
 
-			if (current == null) {
-				// long end = System.currentTimeMillis();
-				// System.out.println("Getting null path from " + from + " to "
-				// + to + " took " + (end - start) + " millis");
-				// System.out.println("Called null contains " +
-				// frontier.getContainsCounter() + " times");
-				return null;
-			}
-		}
+            if (current == null) {
+                // long end = System.currentTimeMillis();
+                // System.out.println("Getting null path from " + from + " to "
+                // + to + " took " + (end - start) + " millis");
+                // System.out.println("Called null contains " +
+                // frontier.getContainsCounter() + " times");
+                return null;
+            }
+        }
 
-		// long end = System.currentTimeMillis();
-		// System.out.println("Getting path from " + from + " to " + to + " took
-		// " + (end - start) + " millis");
-		// System.out.println("Called contains " + frontier.getContainsCounter()
-		// + " times");
+        // long end = System.currentTimeMillis();
+        // System.out.println("Getting path from " + from + " to " + to + " took
+        // " + (end - start) + " millis");
+        // System.out.println("Called contains " + frontier.getContainsCounter()
+        // + " times");
 
-		return frontier.getPath(current);
-	}
+        return frontier.getPath(current);
+    }
 
-	public List<Point> getPath(Point to) {
-		return getPath(new Point(getX(), getY()), to);
-	}
+    public List<Point> getPath(Point to) {
+        return getPath(new Point(getX(), getY()), to);
+    }
 }

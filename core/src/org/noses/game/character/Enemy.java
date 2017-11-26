@@ -13,7 +13,7 @@ public class Enemy extends MovingCharacter {
 	Avatar avatar;
 
 	public Enemy(Avatar avatar, GeldarGame parent) {
-		super("mage.png", parent);
+		super("mage.png", parent, 3);
 
 		this.avatar = avatar;
 		chooseNextSpot();
@@ -38,11 +38,6 @@ public class Enemy extends MovingCharacter {
 		}
 
 		moveTo(point);
-	}
-
-	@Override
-	protected float getNumPerSecond() {
-		return 3;
 	}
 
 	@Override
