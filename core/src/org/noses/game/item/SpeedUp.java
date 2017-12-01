@@ -28,7 +28,7 @@ public class SpeedUp extends Item {
 
     @Override
     public int getNumPerSecond() {
-        return 1;
+        return 2;
     }
 
     @Override

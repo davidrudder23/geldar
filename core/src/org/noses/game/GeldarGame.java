@@ -114,7 +114,7 @@ public class GeldarGame extends ApplicationAdapter implements ApplicationListene
         highlights.put("yellow", yellow);
 
         // Connect to Mongo in the background
-        new Thread(() -> HighScoreRepository.getInstance(getMongoPassword())).start();
+        //new Thread(() -> HighScoreRepository.getInstance(getMongoPassword())).start();
 
         startGame();
     }
